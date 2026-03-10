@@ -15,6 +15,9 @@ import {
   EyeOff,
   ArrowRight,
   CheckCircle2,
+  Shield,
+  Zap,
+  Wallet,
 } from "lucide-react";
 
 export default function RegisterPage() {
@@ -95,17 +98,43 @@ export default function RegisterPage() {
 
   const strength = passwordStrength();
 
+  const steps = [
+    {
+      step: "01",
+      title: "Create your account",
+      desc: "Free registration, no fees",
+      icon: User,
+    },
+    {
+      step: "02",
+      title: "Deposit crypto",
+      desc: "Send and verify via TXID",
+      icon: Wallet,
+    },
+    {
+      step: "03",
+      title: "Subscribe & earn",
+      desc: "Daily commission returns",
+      icon: Zap,
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-[#07070f] flex noise">
+    <div className="min-h-screen bg-[#07070f] flex relative overflow-hidden">
+      {/* Animated background */}
+      <div className="absolute inset-0 bg-grid" />
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-violet-600/10 rounded-full blur-[120px] translate-x-1/2 -translate-y-1/2" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[100px] -translate-x-1/3 translate-y-1/3" />
+
       {/* Left decorative panel */}
-      <div className="hidden lg:flex flex-col justify-between w-1/2 bg-[#0a0a14] border-r border-white/5 p-12 relative overflow-hidden">
-        <div className="absolute top-1/3 left-1/3 w-96 h-96 bg-violet-600/8 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-indigo-500/8 rounded-full blur-3xl pointer-events-none" />
+      <div className="hidden lg:flex flex-col justify-between w-1/2 bg-gradient-to-br from-[#0a0a14] to-[#0f0f1a] border-r border-white/5 p-12 relative z-10">
+        <div className="absolute top-1/3 left-1/4 w-80 h-80 bg-violet-600/8 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/4 w-60 h-60 bg-indigo-500/8 rounded-full blur-[80px] pointer-events-none" />
 
         {/* Logo */}
         <div className="flex items-center gap-3 relative z-10">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/30 animate-pulse-glow">
-            <TrendingUp size={18} className="text-white" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/30">
+            <TrendingUp size={20} className="text-white" />
           </div>
           <span className="text-white font-bold text-xl tracking-tight">
             NexVault
@@ -117,38 +146,25 @@ export default function RegisterPage() {
           <p className="text-white/30 text-xs font-medium uppercase tracking-widest">
             Get started in 3 steps
           </p>
-          {[
-            {
-              step: "01",
-              title: "Create your account",
-              desc: "Free registration, no fees",
-            },
-            {
-              step: "02",
-              title: "Deposit crypto",
-              desc: "Send and verify via TXID",
-            },
-            {
-              step: "03",
-              title: "Subscribe & earn",
-              desc: "Daily commission returns",
-            },
-          ].map((item, i) => (
-            <div
-              key={i}
-              className={`flex items-start gap-4 animate-fade-in-up delay-${(i + 1) * 100}`}
-            >
-              <span className="text-violet-500/50 text-xs font-bold font-mono mt-0.5">
-                {item.step}
-              </span>
-              <div>
-                <p className="text-white/80 text-sm font-semibold">
-                  {item.title}
-                </p>
-                <p className="text-white/35 text-xs">{item.desc}</p>
+          <div className="space-y-4">
+            {steps.map((item, i) => (
+              <div
+                key={i}
+                className={`flex items-start gap-4 animate-fade-in-up`}
+                style={{ animationDelay: `${i * 100}ms` }}
+              >
+                <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-center flex-shrink-0">
+                  <item.icon size={18} className="text-violet-400" />
+                </div>
+                <div>
+                  <p className="text-white/80 text-sm font-semibold">
+                    {item.title}
+                  </p>
+                  <p className="text-white/35 text-xs">{item.desc}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         <p className="relative z-10 text-white/15 text-xs">
@@ -161,10 +177,10 @@ export default function RegisterPage() {
         <div className="w-full max-w-md space-y-7 animate-fade-in-up">
           {/* Mobile logo */}
           <div className="flex lg:hidden items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
-              <TrendingUp size={15} className="text-white" />
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/30">
+              <TrendingUp size={17} className="text-white" />
             </div>
-            <span className="text-white font-bold text-lg">NexVault</span>
+            <span className="text-white font-bold text-xl">NexVault</span>
           </div>
 
           {/* Header */}
@@ -178,16 +194,16 @@ export default function RegisterPage() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Name */}
             <div>
-              <label className="block text-white/50 text-xs font-medium mb-1.5 uppercase tracking-wider">
+              <label className="block text-white/50 text-xs font-medium mb-2 uppercase tracking-wider">
                 Full Name
               </label>
               <div className="relative">
                 <User
-                  size={15}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30"
+                  size={16}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-white/25"
                 />
                 <input
                   type="text"
@@ -195,20 +211,20 @@ export default function RegisterPage() {
                   value={form.name}
                   onChange={handleChange}
                   placeholder="John Doe"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-white text-sm placeholder-white/20 focus:outline-none focus:border-violet-500/60 focus:ring-1 focus:ring-violet-500/20 transition-all"
+                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl pl-11 pr-4 py-3.5 text-white text-sm placeholder-white/20 focus:outline-none focus:border-violet-500/50 focus:bg-white/[0.05] transition-all"
                 />
               </div>
             </div>
 
             {/* Email */}
             <div>
-              <label className="block text-white/50 text-xs font-medium mb-1.5 uppercase tracking-wider">
-                Email
+              <label className="block text-white/50 text-xs font-medium mb-2 uppercase tracking-wider">
+                Email Address
               </label>
               <div className="relative">
                 <Mail
-                  size={15}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30"
+                  size={16}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-white/25"
                 />
                 <input
                   type="email"
@@ -216,20 +232,20 @@ export default function RegisterPage() {
                   value={form.email}
                   onChange={handleChange}
                   placeholder="you@example.com"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-white text-sm placeholder-white/20 focus:outline-none focus:border-violet-500/60 focus:ring-1 focus:ring-violet-500/20 transition-all"
+                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl pl-11 pr-4 py-3.5 text-white text-sm placeholder-white/20 focus:outline-none focus:border-violet-500/50 focus:bg-white/[0.05] transition-all"
                 />
               </div>
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-white/50 text-xs font-medium mb-1.5 uppercase tracking-wider">
+              <label className="block text-white/50 text-xs font-medium mb-2 uppercase tracking-wider">
                 Password
               </label>
               <div className="relative">
                 <Lock
-                  size={15}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30"
+                  size={16}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-white/25"
                 />
                 <input
                   type={showPass ? "text" : "password"}
@@ -237,22 +253,32 @@ export default function RegisterPage() {
                   value={form.password}
                   onChange={handleChange}
                   placeholder="Min. 6 characters"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-11 py-3 text-white text-sm placeholder-white/20 focus:outline-none focus:border-violet-500/60 focus:ring-1 focus:ring-violet-500/20 transition-all"
+                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl pl-11 pr-12 py-3.5 text-white text-sm placeholder-white/20 focus:outline-none focus:border-violet-500/50 focus:bg-white/[0.05] transition-all"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPass(!showPass)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/25 hover:text-white/60 transition-colors"
                 >
-                  {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
+                  {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
               {/* Strength meter */}
               {strength && (
-                <div className="mt-2 space-y-1">
-                  <div className="w-full bg-white/10 rounded-full h-1">
+                <div className="mt-3 space-y-1.5">
+                  <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
                     <div
-                      className={`h-1 rounded-full transition-all duration-300 ${strength.color} ${strength.width}`}
+                      className={`h-full rounded-full transition-all duration-300 ${strength.color}`}
+                      style={{
+                        width:
+                          strength.width === "w-full"
+                            ? "100%"
+                            : strength.width === "w-3/4"
+                              ? "75%"
+                              : strength.width === "w-2/4"
+                                ? "50%"
+                                : "25%",
+                      }}
                     />
                   </div>
                   <p className="text-white/30 text-xs">{strength.label}</p>
@@ -262,13 +288,13 @@ export default function RegisterPage() {
 
             {/* Confirm */}
             <div>
-              <label className="block text-white/50 text-xs font-medium mb-1.5 uppercase tracking-wider">
+              <label className="block text-white/50 text-xs font-medium mb-2 uppercase tracking-wider">
                 Confirm Password
               </label>
               <div className="relative">
                 <Lock
-                  size={15}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30"
+                  size={16}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-white/25"
                 />
                 <input
                   type="password"
@@ -276,12 +302,12 @@ export default function RegisterPage() {
                   value={form.confirm}
                   onChange={handleChange}
                   placeholder="Re-enter password"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-white text-sm placeholder-white/20 focus:outline-none focus:border-violet-500/60 focus:ring-1 focus:ring-violet-500/20 transition-all"
+                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl pl-11 pr-4 py-3.5 text-white text-sm placeholder-white/20 focus:outline-none focus:border-violet-500/50 focus:bg-white/[0.05] transition-all"
                 />
                 {form.confirm && form.confirm === form.password && (
                   <CheckCircle2
-                    size={15}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-emerald-400"
+                    size={16}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-400"
                   />
                 )}
               </div>
@@ -289,7 +315,7 @@ export default function RegisterPage() {
 
             {/* Error */}
             {error && (
-              <div className="flex items-center gap-2 text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 animate-fade-in">
+              <div className="flex items-center gap-2.5 text-red-400 text-sm bg-red-500/10 border border-red-500/15 rounded-xl px-4 py-3 animate-fade-in">
                 <AlertCircle size={15} className="flex-shrink-0" />
                 {error}
               </div>
@@ -299,7 +325,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-violet-600/30 mt-1"
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-violet-400 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-violet-600/25 hover:shadow-violet-500/35 hover:-translate-y-0.5"
             >
               {loading ? (
                 <Loader2 size={16} className="animate-spin" />
@@ -326,3 +352,4 @@ export default function RegisterPage() {
     </div>
   );
 }
+

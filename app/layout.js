@@ -1,5 +1,5 @@
 import { AuthProvider } from "@/context/AuthContext";
-import "./styles/globals.css";
+import "@/styles/globals.css";
 
 export const metadata = {
   title: "NexVault — Crypto Dashboard",

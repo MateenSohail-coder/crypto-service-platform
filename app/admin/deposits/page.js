@@ -110,9 +110,15 @@ export default function AdminDepositsPage() {
     rejected: deposits.filter((d) => d.status === "rejected").length,
   };
 
+  const tabs = [
+    { key: "all", label: "All", color: "bg-violet-600" },
+    { key: "pending", label: "Pending", color: "bg-amber-600" },
+    { key: "approved", label: "Approved", color: "bg-emerald-600" },
+    { key: "rejected", label: "Rejected", color: "bg-red-600" },
+  ];
+
   return (
     <div className="space-y-8 max-w-6xl">
-      {/* Header */}
       <div className="animate-fade-in-up flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-white/40 text-sm mb-1">Verify & approve</p>
@@ -129,30 +135,17 @@ export default function AdminDepositsPage() {
       </div>
 
       {/* Filter tabs */}
-      <div className="animate-fade-in-up delay-100 flex gap-2 bg-[#0f0f1a] border border-white/8 rounded-xl p-1 w-fit flex-wrap">
-        {[
-          { key: "all", label: "All" },
-          { key: "pending", label: "Pending" },
-          { key: "approved", label: "Approved" },
-          { key: "rejected", label: "Rejected" },
-        ].map(({ key, label }) => (
+      <div
+        className="animate-fade-in-up flex gap-2 bg-[#0f0f1a] border border-white/[0.08] rounded-xl p-1 w-fit flex-wrap"
+        style={{ animationDelay: "50ms" }}
+      >
+        {tabs.map((t) => (
           <button
-            key={key}
-            onClick={() => setTab(key)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
-              ${
-                tab === key
-                  ? key === "pending"
-                    ? "bg-amber-600 text-white shadow-lg shadow-amber-600/20"
-                    : key === "approved"
-                      ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/20"
-                      : key === "rejected"
-                        ? "bg-red-600 text-white shadow-lg shadow-red-600/20"
-                        : "bg-violet-600 text-white shadow-lg shadow-violet-600/20"
-                  : "text-white/40 hover:text-white"
-              }`}
+            key={t.key}
+            onClick={() => setTab(t.key)}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${tab === t.key ? `${t.color} text-white shadow-lg` : "text-white/40 hover:text-white"}`}
           >
-            {label} ({counts[key]})
+            {t.label} ({counts[t.key]})
           </button>
         ))}
       </div>
@@ -160,26 +153,24 @@ export default function AdminDepositsPage() {
       {/* Toast */}
       {toast && (
         <div
-          className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl text-sm font-medium shadow-2xl animate-fade-in border
-            ${
-              toast.type === "error"
-                ? "bg-red-900/90 text-red-300 border-red-500/30"
-                : "bg-emerald-900/90 text-emerald-300 border-emerald-500/30"
-            }`}
+          className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl text-sm font-medium shadow-2xl animate-fade-in border ${toast.type === "error" ? "bg-red-900/90 text-red-300 border-red-500/30" : "bg-emerald-900/90 text-emerald-300 border-emerald-500/30"}`}
         >
           {toast.msg}
         </div>
       )}
 
       {/* Deposits list */}
-      <div className="animate-fade-in-up delay-200 space-y-3">
+      <div
+        className="animate-fade-in-up space-y-3"
+        style={{ animationDelay: "100ms" }}
+      >
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <div className="w-6 h-6 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
           </div>
         ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 bg-[#0f0f1a] border border-white/8 rounded-2xl text-white/25">
-            <ArrowDownCircle size={36} className="mb-3 opacity-30" />
+          <div className="empty-state">
+            <ArrowDownCircle size={40} />
             <p className="text-sm">
               No {tab !== "all" ? tab : ""} deposits found.
             </p>
@@ -188,19 +179,13 @@ export default function AdminDepositsPage() {
           filtered.map((dep, i) => (
             <div
               key={dep._id}
-              className={`animate-fade-in-up delay-${(i % 5) * 100} bg-[#0f0f1a] border rounded-2xl p-5 transition-all duration-200
-                ${
-                  dep.status === "pending"
-                    ? "border-amber-500/15 hover:border-amber-500/30"
-                    : "border-white/8 hover:border-white/15"
-                }`}
+              className={`card p-5 transition-all duration-200 ${dep.status === "pending" ? "border-amber-500/15" : ""}`}
+              style={{ animationDelay: `${i * 30}ms` }}
             >
               <div className="flex flex-wrap items-start justify-between gap-4">
-                {/* Left info */}
                 <div className="flex items-start gap-4">
                   <div
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0
-                    ${dep.status === "pending" ? "bg-amber-500/15" : dep.status === "approved" ? "bg-emerald-500/15" : "bg-red-500/15"}`}
+                    className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${dep.status === "pending" ? "bg-amber-500/15" : dep.status === "approved" ? "bg-emerald-500/15" : "bg-red-500/15"}`}
                   >
                     <ArrowDownCircle
                       size={18}
@@ -238,7 +223,6 @@ export default function AdminDepositsPage() {
                   </div>
                 </div>
 
-                {/* Actions — only for pending */}
                 {dep.status === "pending" && (
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <button
@@ -268,7 +252,6 @@ export default function AdminDepositsPage() {
                   </div>
                 )}
 
-                {/* Reviewed info */}
                 {dep.status !== "pending" && dep.reviewedAt && (
                   <div className="text-right">
                     <p className="text-white/25 text-xs">
@@ -284,3 +267,4 @@ export default function AdminDepositsPage() {
     </div>
   );
 }
+

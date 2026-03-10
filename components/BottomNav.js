@@ -27,8 +27,8 @@ export default function BottomNav() {
   if (pathname.startsWith("/admin")) return null;
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0a0a0f]/95 backdrop-blur-xl border-t border-white/5">
-      <div className="flex items-center justify-around px-2 py-2 safe-area-pb">
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0a0a0f]/95 backdrop-blur-2xl border-t border-white/[0.05] safe-area-pb">
+      <div className="flex items-center justify-around px-1 py-2">
         {navLinks.map(({ href, label, icon: Icon }) => {
           const isActive =
             href === "/dashboard"
@@ -39,13 +39,13 @@ export default function BottomNav() {
             <Link
               key={href}
               href={href}
-              className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-all duration-200 min-w-[52px]"
+              className="flex flex-col items-center gap-1 px-2 py-1.5 rounded-xl transition-all duration-200 min-w-[52px] group"
             >
               <div
                 className={`p-1.5 rounded-lg transition-all duration-200 ${
                   isActive
-                    ? "bg-violet-600/25 text-violet-400"
-                    : "text-white/35 hover:text-white/60"
+                    ? "bg-gradient-to-br from-violet-600/30 to-violet-500/20 text-violet-400 shadow-lg shadow-violet-500/20"
+                    : "text-white/30 hover:text-white/60"
                 }`}
               >
                 <Icon size={18} strokeWidth={isActive ? 2.5 : 1.8} />
@@ -57,6 +57,9 @@ export default function BottomNav() {
               >
                 {label}
               </span>
+              {isActive && (
+                <div className="absolute -bottom-0 w-8 h-0.5 bg-gradient-to-r from-violet-500 to-indigo-500 rounded-full" />
+              )}
             </Link>
           );
         })}
@@ -64,3 +67,4 @@ export default function BottomNav() {
     </nav>
   );
 }
+

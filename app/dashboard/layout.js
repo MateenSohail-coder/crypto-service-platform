@@ -31,12 +31,12 @@ export default function DashboardLayout({ children }) {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-[#07070f]">
+    <div className="min-h-screen ml-96 bg-[#07070f]">
       {/* Sidebar — desktop */}
       <Sidebar />
 
       {/* Main content */}
-      <div className="lg:pl-64 flex flex-col min-h-screen">
+      <div className="lg:pl-64 flex flex-col ml-96 min-h-screen">
         <Navbar />
         <main className="flex-1 px-4 lg:px-8 py-6 pb-24 lg:pb-8">
           {children}
@@ -48,3 +48,4 @@ export default function DashboardLayout({ children }) {
     </div>
   );
 }
+

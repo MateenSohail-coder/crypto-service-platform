@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import ServiceCard from "@/components/ServiceCard";
-import { Layers, AlertCircle } from "lucide-react";
+import { Layers, AlertCircle, Zap, TrendingUp } from "lucide-react";
 
 export default function ServicesPage() {
   const { user, updateUser } = useAuth();
@@ -74,8 +74,8 @@ export default function ServicesPage() {
             Services
           </h1>
         </div>
-        <div className="flex items-center gap-2 bg-[#0f0f1a] border border-white/8 rounded-xl px-4 py-2.5">
-          <div className="w-2 h-2 rounded-full bg-violet-500" />
+        <div className="flex items-center gap-3 bg-[#0f0f1a] border border-white/[0.08] rounded-xl px-4 py-2.5">
+          <div className="w-2 h-2 rounded-full bg-violet-500 animate-pulse" />
           <span className="text-white/50 text-sm">
             <span className="text-white font-semibold">{remaining}</span>{" "}
             subscriptions left today
@@ -85,12 +85,41 @@ export default function ServicesPage() {
 
       {/* Balance warning */}
       {user?.balance === 0 && (
-        <div className="animate-fade-in flex items-center gap-3 bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3 text-amber-400 text-sm">
+        <div className="animate-fade-in flex items-center gap-3 bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3.5 text-amber-400 text-sm">
           <AlertCircle size={16} className="flex-shrink-0" />
           Your balance is $0. Please make a deposit before subscribing to
           services.
         </div>
       )}
+
+      {/* Stats summary */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="stat-card">
+          <div className="flex items-center gap-2 mb-2">
+            <Zap size={14} className="text-violet-400" />
+            <span className="text-white/40 text-xs">Available Services</span>
+          </div>
+          <p className="text-white text-xl font-bold">{services.length}</p>
+        </div>
+        <div className="stat-card">
+          <div className="flex items-center gap-2 mb-2">
+            <TrendingUp size={14} className="text-emerald-400" />
+            <span className="text-white/40 text-xs">Avg. Commission</span>
+          </div>
+          <p className="text-white text-xl font-bold">
+            {services.length > 0
+              ? `${(services.reduce((s, v) => s + v.commissionRate, 0) / services.length).toFixed(1)}%`
+              : "0%"}
+          </p>
+        </div>
+        <div className="stat-card hidden lg:block">
+          <div className="flex items-center gap-2 mb-2">
+            <Layers size={14} className="text-indigo-400" />
+            <span className="text-white/40 text-xs">Your Daily Limit</span>
+          </div>
+          <p className="text-white text-xl font-bold">24/day</p>
+        </div>
+      </div>
 
       {/* Toast */}
       {toast && (
@@ -112,13 +141,13 @@ export default function ServicesPage() {
           {[...Array(6)].map((_, i) => (
             <div
               key={i}
-              className="bg-[#0f0f1a] border border-white/8 rounded-2xl p-5 h-52 animate-pulse"
+              className="bg-[#0f0f1a] border border-white/8 rounded-2xl p-5 h-72 animate-pulse"
             />
           ))}
         </div>
       ) : services.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-white/30">
-          <Layers size={40} className="mb-4 opacity-30" />
+        <div className="empty-state">
+          <Layers size={48} />
           <p className="text-sm">No services available yet.</p>
         </div>
       ) : (
@@ -126,7 +155,8 @@ export default function ServicesPage() {
           {services.map((service, i) => (
             <div
               key={service._id}
-              className={`animate-fade-in-up delay-${(i % 5) * 100}`}
+              className="animate-fade-in-up"
+              style={{ animationDelay: `${i * 50}ms` }}
             >
               <ServiceCard
                 service={service}
@@ -140,3 +170,4 @@ export default function ServicesPage() {
     </div>
   );
 }
+

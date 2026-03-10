@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ArticleCard from "@/components/ArticleCard";
-import { BookOpen, X } from "lucide-react";
+import { BookOpen, X, Calendar, User } from "lucide-react";
 
 export default function ArticlesPage() {
   const [articles, setArticles] = useState([]);
@@ -46,8 +46,8 @@ export default function ArticlesPage() {
           ))}
         </div>
       ) : articles.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-white/30">
-          <BookOpen size={40} className="mb-4 opacity-30" />
+        <div className="empty-state">
+          <BookOpen size={48} />
           <p className="text-sm">No articles published yet.</p>
         </div>
       ) : (
@@ -55,7 +55,8 @@ export default function ArticlesPage() {
           {articles.map((article, i) => (
             <div
               key={article._id}
-              className={`animate-fade-in-up delay-${(i % 5) * 100}`}
+              className="animate-fade-in-up"
+              style={{ animationDelay: `${i * 50}ms` }}
             >
               <ArticleCard article={article} onClick={setSelected} />
             </div>
@@ -65,14 +66,8 @@ export default function ArticlesPage() {
 
       {/* Article modal */}
       {selected && (
-        <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in"
-          onClick={() => setSelected(null)}
-        >
-          <div
-            className="bg-[#0f0f1a] border border-white/10 rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto animate-fade-in-up"
-            onClick={(e) => e.stopPropagation()}
-          >
+        <div className="modal-overlay" onClick={() => setSelected(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             {selected.coverImage && (
               <img
                 src={selected.coverImage}
@@ -92,16 +87,21 @@ export default function ArticlesPage() {
                   <X size={16} />
                 </button>
               </div>
-              <div className="flex items-center gap-3 text-white/30 text-xs">
-                <span>By {selected.createdBy?.name || "Admin"}</span>
-                <span>·</span>
-                <span>
-                  {new Date(selected.createdAt).toLocaleDateString("en-US", {
-                    month: "long",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
-                </span>
+              <div className="flex items-center gap-4 text-white/30 text-xs">
+                <div className="flex items-center gap-1.5">
+                  <User size={12} />
+                  <span>{selected.createdBy?.name || "Admin"}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Calendar size={12} />
+                  <span>
+                    {new Date(selected.createdAt).toLocaleDateString("en-US", {
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </span>
+                </div>
               </div>
               <div className="h-px bg-white/8" />
               <p className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap">
@@ -114,3 +114,4 @@ export default function ArticlesPage() {
     </div>
   );
 }
+

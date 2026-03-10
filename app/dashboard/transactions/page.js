@@ -8,6 +8,7 @@ import {
   CheckCircle,
   XCircle,
   TrendingUp,
+  ArrowRight,
 } from "lucide-react";
 
 function StatusBadge({ status }) {
@@ -64,6 +65,21 @@ export default function TransactionsPage() {
     fetchAll();
   }, []);
 
+  const tabs = [
+    {
+      key: "deposits",
+      label: "Deposits",
+      count: deposits.length,
+      icon: ArrowDownCircle,
+    },
+    {
+      key: "subscriptions",
+      label: "Subscriptions",
+      count: subscriptions.length,
+      icon: Zap,
+    },
+  ];
+
   return (
     <div className="max-w-4xl space-y-8">
       <div className="animate-fade-in-up">
@@ -74,33 +90,35 @@ export default function TransactionsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 bg-[#0f0f1a] border border-white/8 rounded-xl p-1 w-fit animate-fade-in-up delay-100">
-        {["deposits", "subscriptions"].map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 capitalize
-              ${
-                tab === t
-                  ? "bg-violet-600 text-white shadow-lg shadow-violet-600/20"
-                  : "text-white/40 hover:text-white"
-              }`}
-          >
-            {t} ({t === "deposits" ? deposits.length : subscriptions.length})
-          </button>
-        ))}
+      <div className="animate-fade-in-up" style={{ animationDelay: "50ms" }}>
+        <div className="tab-list w-fit">
+          {tabs.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              className={`tab-item flex items-center gap-2 ${tab === t.key ? "active" : ""}`}
+            >
+              <t.icon size={14} />
+              {t.label}
+              <span className="text-white/30 text-xs">({t.count})</span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Table */}
-      <div className="animate-fade-in-up delay-200 bg-[#0f0f1a] border border-white/8 rounded-2xl overflow-hidden">
+      <div
+        className="animate-fade-in-up table-container"
+        style={{ animationDelay: "100ms" }}
+      >
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <div className="w-6 h-6 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin" />
           </div>
         ) : tab === "deposits" ? (
           deposits.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-white/30">
-              <ArrowDownCircle size={36} className="mb-3 opacity-30" />
+            <div className="empty-state">
+              <ArrowDownCircle size={40} />
               <p className="text-sm">No deposits yet</p>
             </div>
           ) : (
@@ -108,11 +126,11 @@ export default function TransactionsPage() {
               {deposits.map((dep) => (
                 <div
                   key={dep._id}
-                  className="flex items-center justify-between px-5 py-4 hover:bg-white/3 transition-colors"
+                  className="table-row flex items-center justify-between px-5 py-4"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-indigo-500/15 flex items-center justify-center flex-shrink-0">
-                      <ArrowDownCircle size={16} className="text-indigo-400" />
+                    <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center flex-shrink-0">
+                      <ArrowDownCircle size={18} className="text-indigo-400" />
                     </div>
                     <div>
                       <p className="text-white text-sm font-semibold">
@@ -123,7 +141,7 @@ export default function TransactionsPage() {
                       </p>
                     </div>
                   </div>
-                  <div className="flex flex-col items-end gap-1">
+                  <div className="flex flex-col items-end gap-1.5">
                     <StatusBadge status={dep.status} />
                     <p className="text-white/25 text-xs">
                       {new Date(dep.createdAt).toLocaleDateString()}
@@ -134,8 +152,8 @@ export default function TransactionsPage() {
             </div>
           )
         ) : subscriptions.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-white/30">
-            <Zap size={36} className="mb-3 opacity-30" />
+          <div className="empty-state">
+            <Zap size={40} />
             <p className="text-sm">No subscriptions yet</p>
           </div>
         ) : (
@@ -143,11 +161,11 @@ export default function TransactionsPage() {
             {subscriptions.map((sub) => (
               <div
                 key={sub._id}
-                className="flex items-center justify-between px-5 py-4 hover:bg-white/3 transition-colors"
+                className="table-row flex items-center justify-between px-5 py-4"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-violet-500/15 flex items-center justify-center flex-shrink-0">
-                    <Zap size={16} className="text-violet-400" />
+                  <div className="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center flex-shrink-0">
+                    <Zap size={18} className="text-violet-400" />
                   </div>
                   <div>
                     <p className="text-white text-sm font-semibold">
@@ -158,7 +176,7 @@ export default function TransactionsPage() {
                     </p>
                   </div>
                 </div>
-                <div className="flex flex-col items-end gap-1">
+                <div className="flex flex-col items-end gap-1.5">
                   <span className="text-emerald-400 text-sm font-bold">
                     +${sub.commissionEarned.toFixed(2)}
                   </span>
@@ -174,3 +192,4 @@ export default function TransactionsPage() {
     </div>
   );
 }
+

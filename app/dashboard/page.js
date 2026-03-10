@@ -13,19 +13,18 @@ import {
   Clock,
   CheckCircle,
   XCircle,
+  Wallet,
+  Activity,
 } from "lucide-react";
 
-function StatCard({ label, value, sub, icon: Icon, color, delay }) {
+function StatCard({ label, value, sub, icon: Icon, gradient, delay }) {
   return (
     <div
-      className={`animate-fade-in-up bg-[#0f0f1a] border border-white/8 rounded-2xl p-5 hover:border-white/15 transition-all duration-300 delay-${delay}`}
+      className={`stat-card animate-fade-in-up hover-lift`}
+      style={{ animationDelay: `${delay}ms` }}
     >
-      <div className="flex items-start justify-between mb-3">
-        <div
-          className={`w-9 h-9 rounded-xl flex items-center justify-center ${color}`}
-        >
-          <Icon size={17} className="text-white" />
-        </div>
+      <div className={`stat-card-icon ${gradient}`}>
+        <Icon size={18} className="text-white" />
       </div>
       <p className="text-white/40 text-xs mb-1">{label}</p>
       <p className="text-white text-2xl font-bold tracking-tight">{value}</p>
@@ -102,58 +101,97 @@ export default function DashboardPage() {
   );
   const todaySubs = user?.subscriptionsToday || 0;
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "morning";
+    if (hour < 17) return "afternoon";
+    return "evening";
+  };
+
+  const quickActions = [
+    {
+      href: "/dashboard/deposit",
+      label: "Make Deposit",
+      icon: ArrowDownCircle,
+      color: "text-indigo-400",
+      bg: "bg-indigo-500/10",
+    },
+    {
+      href: "/dashboard/services",
+      label: "Browse Services",
+      icon: Layers,
+      color: "text-violet-400",
+      bg: "bg-violet-500/10",
+    },
+    {
+      href: "/dashboard/transactions",
+      label: "View History",
+      icon: Receipt,
+      color: "text-amber-400",
+      bg: "bg-amber-500/10",
+    },
+    {
+      href: "/dashboard/articles",
+      label: "Read Articles",
+      icon: ArrowUpRight,
+      color: "text-emerald-400",
+      bg: "bg-emerald-500/10",
+    },
+  ];
+
   return (
     <div className="space-y-8 max-w-6xl">
       {/* Welcome */}
       <div className="animate-fade-in-up">
-        <h2 className="text-white/40 text-sm mb-1">
+        <p className="text-white/40 text-sm mb-1">
           {new Date().toLocaleDateString("en-US", {
             weekday: "long",
             month: "long",
             day: "numeric",
+            year: "numeric",
           })}
-        </h2>
+        </p>
         <h1 className="text-white text-2xl font-bold tracking-tight">
-          Good{" "}
-          {new Date().getHours() < 12
-            ? "morning"
-            : new Date().getHours() < 17
-              ? "afternoon"
-              : "evening"}
-          , <span className="text-violet-400">{user?.name?.split(" ")[0]}</span>{" "}
-          👋
+          Good {getGreeting()},{" "}
+          <span className="text-gradient">{user?.name?.split(" ")[0]}</span> 👋
         </h1>
       </div>
 
       {/* Balance hero */}
-      <div className="animate-fade-in-up delay-100 relative bg-gradient-to-br from-violet-900/40 via-indigo-900/20 to-[#0f0f1a] border border-violet-500/20 rounded-2xl p-6 overflow-hidden animate-pulse-glow">
+      <div
+        className="hero-card animate-fade-in-up"
+        style={{ animationDelay: "100ms" }}
+      >
         <div className="absolute top-0 right-0 w-64 h-64 bg-violet-600/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10">
-          <p className="text-white/40 text-xs font-medium uppercase tracking-widest mb-2">
-            Available Balance
-          </p>
+          <div className="flex items-center gap-2 mb-3">
+            <Wallet size={16} className="text-violet-400" />
+            <p className="text-white/50 text-xs font-medium uppercase tracking-widest">
+              Available Balance
+            </p>
+          </div>
           <p className="text-white text-5xl font-bold tracking-tight mb-1">
             ${user?.balance?.toFixed(2) ?? "0.00"}
           </p>
-          <p className="text-white/30 text-sm">
+          <p className="text-white/40 text-sm mb-6">
             Total earned from commissions:{" "}
             <span className="text-emerald-400 font-semibold">
               ${totalEarned.toFixed(2)}
             </span>
           </p>
-          <div className="flex gap-3 mt-5">
+          <div className="flex flex-wrap gap-3">
             <Link
               href="/dashboard/deposit"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold transition-all shadow-lg shadow-violet-600/25"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-violet-400 text-white text-sm font-semibold transition-all shadow-lg shadow-violet-600/25 hover:shadow-violet-500/35 hover:-translate-y-0.5"
             >
-              <ArrowDownCircle size={15} />
+              <ArrowDownCircle size={16} />
               Deposit
             </Link>
             <Link
               href="/dashboard/services"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-sm font-semibold transition-all border border-white/10"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-white text-sm font-semibold transition-all border border-white/10 hover:border-white/20"
             >
-              <Zap size={15} />
+              <Zap size={16} />
               Subscribe
             </Link>
           </div>
@@ -168,7 +206,8 @@ export default function DashboardPage() {
           sub="Approved deposits"
           icon={ArrowDownCircle}
           color="bg-indigo-500/20"
-          delay={100}
+          gradient="bg-gradient-to-br from-indigo-500/20 to-indigo-600/10"
+          delay={200}
         />
         <StatCard
           label="Commission Earned"
@@ -176,7 +215,8 @@ export default function DashboardPage() {
           sub="All time"
           icon={TrendingUp}
           color="bg-emerald-500/20"
-          delay={200}
+          gradient="bg-gradient-to-br from-emerald-500/20 to-emerald-600/10"
+          delay={300}
         />
         <StatCard
           label="Subscriptions Today"
@@ -184,58 +224,33 @@ export default function DashboardPage() {
           sub="Daily limit"
           icon={Layers}
           color="bg-violet-500/20"
-          delay={300}
+          gradient="bg-gradient-to-br from-violet-500/20 to-violet-600/10"
+          delay={400}
         />
         <StatCard
           label="Total Subscriptions"
           value={subscriptions.length}
           sub="All time"
-          icon={Receipt}
+          icon={Activity}
           color="bg-amber-500/20"
-          delay={400}
+          gradient="bg-gradient-to-br from-amber-500/20 to-amber-600/10"
+          delay={500}
         />
       </div>
 
       {/* Quick actions */}
-      <div className="animate-fade-in-up delay-300">
-        <h3 className="text-white/50 text-xs font-medium uppercase tracking-widest mb-4">
-          Quick Actions
-        </h3>
+      <div className="animate-fade-in-up" style={{ animationDelay: "300ms" }}>
+        <h3 className="section-title mb-4">Quick Actions</h3>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {[
-            {
-              href: "/dashboard/deposit",
-              label: "Make Deposit",
-              icon: ArrowDownCircle,
-              color: "text-indigo-400",
-            },
-            {
-              href: "/dashboard/services",
-              label: "Browse Services",
-              icon: Layers,
-              color: "text-violet-400",
-            },
-            {
-              href: "/dashboard/transactions",
-              label: "View History",
-              icon: Receipt,
-              color: "text-amber-400",
-            },
-            {
-              href: "/dashboard/articles",
-              label: "Read Articles",
-              icon: ArrowUpRight,
-              color: "text-emerald-400",
-            },
-          ].map(({ href, label, icon: Icon, color }) => (
-            <Link
-              key={href}
-              href={href}
-              className="flex items-center gap-3 bg-[#0f0f1a] border border-white/8 rounded-xl px-4 py-3 hover:border-white/20 hover:bg-white/5 transition-all duration-200 group"
-            >
-              <Icon size={16} className={`${color} flex-shrink-0`} />
-              <span className="text-white/60 text-sm group-hover:text-white transition-colors">
-                {label}
+          {quickActions.map((action) => (
+            <Link key={action.href} href={action.href} className="quick-action">
+              <div
+                className={`w-9 h-9 rounded-lg ${action.bg} flex items-center justify-center`}
+              >
+                <action.icon size={16} className={action.color} />
+              </div>
+              <span className="text-white/60 text-sm font-medium">
+                {action.label}
               </span>
             </Link>
           ))}
@@ -243,11 +258,9 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent deposits */}
-      <div className="animate-fade-in-up delay-400">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-white/50 text-xs font-medium uppercase tracking-widest">
-            Recent Deposits
-          </h3>
+      <div className="animate-fade-in-up" style={{ animationDelay: "400ms" }}>
+        <div className="section-header">
+          <h3 className="section-title">Recent Deposits</h3>
           <Link
             href="/dashboard/transactions"
             className="text-violet-400 hover:text-violet-300 text-xs transition-colors"
@@ -255,14 +268,14 @@ export default function DashboardPage() {
             View all →
           </Link>
         </div>
-        <div className="bg-[#0f0f1a] border border-white/8 rounded-2xl overflow-hidden">
+        <div className="table-container">
           {loadingData ? (
             <div className="flex items-center justify-center py-12">
               <div className="w-6 h-6 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin" />
             </div>
           ) : deposits.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-white/30">
-              <ArrowDownCircle size={32} className="mb-3 opacity-30" />
+            <div className="empty-state">
+              <ArrowDownCircle size={40} />
               <p className="text-sm">No deposits yet</p>
               <Link
                 href="/dashboard/deposit"
@@ -276,14 +289,14 @@ export default function DashboardPage() {
               {deposits.slice(0, 5).map((dep) => (
                 <div
                   key={dep._id}
-                  className="flex items-center justify-between px-5 py-4 hover:bg-white/3 transition-colors"
+                  className="table-row flex items-center justify-between px-5 py-4"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-indigo-500/15 flex items-center justify-center">
-                      <ArrowDownCircle size={15} className="text-indigo-400" />
+                    <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center">
+                      <ArrowDownCircle size={18} className="text-indigo-400" />
                     </div>
                     <div>
-                      <p className="text-white text-sm font-medium">
+                      <p className="text-white text-sm font-semibold">
                         ${dep.amount.toFixed(2)}
                       </p>
                       <p className="text-white/30 text-xs font-mono truncate max-w-[140px]">
@@ -291,7 +304,7 @@ export default function DashboardPage() {
                       </p>
                     </div>
                   </div>
-                  <div className="flex flex-col items-end gap-1">
+                  <div className="flex flex-col items-end gap-1.5">
                     <StatusBadge status={dep.status} />
                     <p className="text-white/25 text-xs">
                       {new Date(dep.createdAt).toLocaleDateString()}
@@ -306,3 +319,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+

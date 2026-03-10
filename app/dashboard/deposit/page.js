@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import DepositForm from "@/components/DepositForm";
-import { ArrowDownCircle, Clock, CheckCircle, XCircle } from "lucide-react";
+import {
+  ArrowDownCircle,
+  Clock,
+  CheckCircle,
+  Wallet,
+  XCircle,
+} from "lucide-react";
 
 function StatusBadge({ status }) {
   const map = {
@@ -53,8 +59,12 @@ export default function DepositPage() {
     fetchDeposits();
   }, []);
 
+  const totalDeposited = deposits
+    .filter((d) => d.status === "approved")
+    .reduce((sum, d) => sum + d.amount, 0);
+
   return (
-    <div className="max-w-4xl space-y-8">
+    <div className="max-w-5xl space-y-8">
       <div className="animate-fade-in-up">
         <p className="text-white/40 text-sm mb-1">Fund your account</p>
         <h1 className="text-white text-2xl font-bold tracking-tight">
@@ -62,31 +72,60 @@ export default function DepositPage() {
         </h1>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-6 animate-fade-in-up delay-100">
-        <DepositForm onSuccess={fetchDeposits} />
+      <div
+        className="grid grid-cols-3 gap-4 animate-fade-in-up"
+        style={{ animationDelay: "50ms" }}
+      >
+        <div className="stat-card">
+          <div className="flex items-center gap-2 mb-2">
+            <Wallet size={14} className="text-emerald-400" />
+            <span className="text-white/40 text-xs">Total Deposited</span>
+          </div>
+          <p className="text-white text-xl font-bold">
+            ${totalDeposited.toFixed(2)}
+          </p>
+        </div>
+        <div className="stat-card">
+          <div className="flex items-center gap-2 mb-2">
+            <Clock size={14} className="text-amber-400" />
+            <span className="text-white/40 text-xs">Pending</span>
+          </div>
+          <p className="text-white text-xl font-bold">
+            {deposits.filter((d) => d.status === "pending").length}
+          </p>
+        </div>
+        <div className="stat-card">
+          <div className="flex items-center gap-2 mb-2">
+            <CheckCircle size={14} className="text-violet-400" />
+            <span className="text-white/40 text-xs">Total Deposits</span>
+          </div>
+          <p className="text-white text-xl font-bold">{deposits.length}</p>
+        </div>
+      </div>
 
-        {/* Deposit history */}
+      <div
+        className="grid lg:grid-cols-2 gap-6 animate-fade-in-up"
+        style={{ animationDelay: "100ms" }}
+      >
+        <DepositForm onSuccess={fetchDeposits} />
         <div className="space-y-4">
           <h3 className="text-white/50 text-xs font-medium uppercase tracking-widest">
             Deposit History
           </h3>
-          <div className="bg-[#0f0f1a] border border-white/8 rounded-2xl overflow-hidden">
+          <div className="table-container">
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="w-6 h-6 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin" />
               </div>
             ) : deposits.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-white/30">
-                <ArrowDownCircle size={32} className="mb-3 opacity-30" />
+              <div className="empty-state">
+                <ArrowDownCircle size={40} />
                 <p className="text-sm">No deposits yet</p>
               </div>
             ) : (
               <div className="divide-y divide-white/5 max-h-[520px] overflow-y-auto">
                 {deposits.map((dep) => (
-                  <div
-                    key={dep._id}
-                    className="px-5 py-4 hover:bg-white/3 transition-colors"
-                  >
+                  <div key={dep._id} className="table-row px-5 py-4">
                     <div className="flex items-center justify-between mb-2">
                       <p className="text-white font-semibold">
                         ${dep.amount.toFixed(2)}
@@ -109,3 +148,4 @@ export default function DepositPage() {
     </div>
   );
 }
+
