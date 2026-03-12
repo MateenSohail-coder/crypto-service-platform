@@ -1,6 +1,8 @@
 import connectDB from "@/lib/mongodb";
 import Deposit from "@/models/Deposit";
 import { requireAuth } from "@/middleware/authMiddleware";
+import { notifyAdmins } from "@/lib/eventEmitter";
+import { createAdminNotification } from "@/lib/createNotification";
 
 export async function POST(request) {
   try {
@@ -12,7 +14,6 @@ export async function POST(request) {
     const body = await request.json();
     const { amount, txHash } = body;
 
-    // Validate input
     if (!amount || !txHash) {
       return Response.json(
         {
@@ -37,7 +38,6 @@ export async function POST(request) {
       );
     }
 
-    // Check for duplicate txHash
     const existing = await Deposit.findOne({ txHash: txHash.trim() });
     if (existing) {
       return Response.json(
@@ -49,12 +49,27 @@ export async function POST(request) {
       );
     }
 
-    // Create deposit
     const deposit = await Deposit.create({
       userId: user.id,
       amount,
       txHash: txHash.trim(),
       status: "pending",
+    });
+
+    // ✅ Save persistent notification in DB for all admins
+    await createAdminNotification({
+      title: "New Deposit Request",
+      message: `A user submitted a deposit of $${amount}. Review required.`,
+      type: "new_deposit",
+      metadata: { depositId: deposit._id, amount, txHash: txHash.trim() },
+    });
+
+    // ✅ Also push real-time SSE to online admins
+    notifyAdmins("new_deposit", {
+      depositId: deposit._id,
+      amount: deposit.amount,
+      txHash: deposit.txHash,
+      userId: user.id,
     });
 
     return Response.json(
@@ -74,7 +89,6 @@ export async function POST(request) {
   }
 }
 
-// GET - fetch current user's deposits
 export async function GET(request) {
   try {
     const { user, response } = await requireAuth(request);

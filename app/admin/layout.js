@@ -11,8 +11,15 @@ export default function AdminLayout({ children }) {
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && (!user || user.role !== "admin")) {
-      router.push("/login");
+    if (!loading) {
+      if (!user) {
+        router.push("/login");
+        return;
+      }
+      if (user.role !== "admin") {
+        router.push("/dashboard");
+        return;
+      }
     }
   }, [user, loading, router]);
 
@@ -21,7 +28,7 @@ export default function AdminLayout({ children }) {
       <div className="min-h-screen bg-[#07070f] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 animate-pulse" />
-          <p className="text-white/30 text-sm">Loading...</p>
+          <p className="text-white/30 text-sm">Loading admin panel...</p>
         </div>
       </div>
     );
@@ -31,15 +38,13 @@ export default function AdminLayout({ children }) {
 
   return (
     <div className="min-h-screen bg-[#07070f]">
-      {/* Sidebar — desktop */}
+      {/* Subtle amber tint to distinguish admin */}
+      <div className="fixed inset-0 bg-gradient-to-br from-amber-950/10 via-transparent to-transparent pointer-events-none z-0" />
       <Sidebar />
-
-      {/* Main content */}
-      <div className="lg:pl-64 flex flex-col min-h-screen">
+      <div className="lg:pl-64 flex flex-col min-h-screen relative z-10">
         <Navbar />
-        <main className="flex-1 px-4 lg:px-8 py-6">{children}</main>
+        <main className="flex-1 px-4 lg:px-8 py-6 pb-8">{children}</main>
       </div>
     </div>
   );
 }
-

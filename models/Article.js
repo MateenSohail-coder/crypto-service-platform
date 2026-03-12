@@ -4,21 +4,20 @@ const ArticleSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: [true, "Article title is required"],
+      required: true,
       trim: true,
     },
     content: {
       type: String,
-      required: [true, "Article content is required"],
+      required: true,
     },
     excerpt: {
       type: String,
-      trim: true,
       default: "",
     },
     coverImage: {
       type: String,
-      default: "",
+      default: null, // base64 string
     },
     isPublished: {
       type: Boolean,
@@ -27,7 +26,6 @@ const ArticleSchema = new mongoose.Schema(
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
     },
   },
   { timestamps: true },

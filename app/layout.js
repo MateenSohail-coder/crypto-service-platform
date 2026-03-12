@@ -1,4 +1,5 @@
 import { AuthProvider } from "@/context/AuthContext";
+import NotificationProvider from "@/components/NotificationProvider";
 import "@/styles/globals.css";
 
 export const metadata = {
@@ -19,7 +20,9 @@ export default function RootLayout({ children }) {
         className="bg-[#07070f] text-white antialiased"
         style={{ fontFamily: "'Sora', sans-serif" }}
       >
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <NotificationProvider>{children}</NotificationProvider>
+        </AuthProvider>
       </body>
     </html>
   );

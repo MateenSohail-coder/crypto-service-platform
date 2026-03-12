@@ -8,7 +8,6 @@ import {
   CheckCircle,
   XCircle,
   TrendingUp,
-  ArrowRight,
 } from "lucide-react";
 
 function StatusBadge({ status }) {
@@ -26,10 +25,12 @@ function StatusBadge({ status }) {
       icon: XCircle,
     },
   };
+
   const { color, icon: Icon } = map[status] || map.pending;
+
   return (
     <span
-      className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border ${color}`}
+      className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-sm border ${color}`}
     >
       <Icon size={11} />
       {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -47,13 +48,16 @@ export default function TransactionsPage() {
     const fetchAll = async () => {
       const token = localStorage.getItem("token");
       const headers = { Authorization: `Bearer ${token}` };
+
       try {
         const [depRes, subRes] = await Promise.all([
           fetch("/api/deposits/create", { headers }),
           fetch("/api/services/subscribe", { headers }),
         ]);
+
         const depData = await depRes.json();
         const subData = await subRes.json();
+
         if (depData.success) setDeposits(depData.deposits);
         if (subData.success) setSubscriptions(subData.subscriptions);
       } catch (err) {
@@ -62,6 +66,7 @@ export default function TransactionsPage() {
         setLoading(false);
       }
     };
+
     fetchAll();
   }, []);
 
@@ -80,70 +85,97 @@ export default function TransactionsPage() {
     },
   ];
 
+  const totalDeposited = deposits
+    .filter((d) => d.status === "approved")
+    .reduce((sum, d) => sum + d.amount, 0);
+
   return (
-    <div className="max-w-4xl space-y-8">
-      <div className="animate-fade-in-up">
-        <p className="text-white/40 text-sm mb-1">Your financial history</p>
-        <h1 className="text-white text-2xl font-bold tracking-tight">
-          Transactions
-        </h1>
+    <div className="max-w-5xl mx-auto space-y-8">
+      {/* Header */}
+      <div>
+        <p className="text-white/40 text-sm mb-1">Your financial activity</p>
+        <h1 className="text-white text-2xl font-bold">Transactions</h1>
       </div>
 
-      {/* Tabs */}
-      <div className="animate-fade-in-up" style={{ animationDelay: "50ms" }}>
-        <div className="tab-list w-fit">
-          {tabs.map((t) => (
-            <button
-              key={t.key}
-              onClick={() => setTab(t.key)}
-              className={`tab-item flex items-center gap-2 ${tab === t.key ? "active" : ""}`}
-            >
-              <t.icon size={14} />
-              {t.label}
-              <span className="text-white/30 text-xs">({t.count})</span>
-            </button>
-          ))}
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-[#0f0f1a] border border-white/10 p-4 rounded-sm">
+          <p className="text-white/40 text-xs mb-1">Total Deposited</p>
+          <p className="text-white text-xl font-semibold">
+            ${totalDeposited.toFixed(2)}
+          </p>
+        </div>
+
+        <div className="bg-[#0f0f1a] border border-white/10 p-4 rounded-sm">
+          <p className="text-white/40 text-xs mb-1">Total Deposits</p>
+          <p className="text-white text-xl font-semibold">{deposits.length}</p>
+        </div>
+
+        <div className="bg-[#0f0f1a] border border-white/10 p-4 rounded-sm">
+          <p className="text-white/40 text-xs mb-1">Subscriptions</p>
+          <p className="text-white text-xl font-semibold">
+            {subscriptions.length}
+          </p>
         </div>
       </div>
 
-      {/* Table */}
-      <div
-        className="animate-fade-in-up table-container"
-        style={{ animationDelay: "100ms" }}
-      >
+      {/* Tabs */}
+      <div className="flex gap-2 border border-white/10 p-1 rounded-sm w-fit bg-[#0f0f1a]">
+        {tabs.map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setTab(t.key)}
+            className={`flex items-center gap-2 px-4 py-2 text-sm rounded-sm transition ${
+              tab === t.key
+                ? "bg-violet-600 text-white"
+                : "text-white/60 hover:text-white hover:bg-white/5"
+            }`}
+          >
+            <t.icon size={14} />
+            {t.label}
+            <span className="text-xs opacity-60">({t.count})</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Table Container */}
+      <div className="bg-[#0f0f1a] border border-white/10 rounded-sm overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <div className="w-6 h-6 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin" />
           </div>
         ) : tab === "deposits" ? (
           deposits.length === 0 ? (
-            <div className="empty-state">
-              <ArrowDownCircle size={40} />
-              <p className="text-sm">No deposits yet</p>
+            <div className="flex flex-col items-center justify-center py-16 text-white/40">
+              <ArrowDownCircle size={42} />
+              <p className="mt-3 text-sm">No deposits yet</p>
             </div>
           ) : (
             <div className="divide-y divide-white/5">
               {deposits.map((dep) => (
                 <div
                   key={dep._id}
-                  className="table-row flex items-center justify-between px-5 py-4"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between px-5 py-4 hover:bg-white/[0.02] transition"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-sm bg-indigo-500/10 flex items-center justify-center">
                       <ArrowDownCircle size={18} className="text-indigo-400" />
                     </div>
+
                     <div>
-                      <p className="text-white text-sm font-semibold">
+                      <p className="text-white font-semibold text-sm">
                         ${dep.amount.toFixed(2)}
                       </p>
-                      <p className="text-white/30 text-xs font-mono truncate max-w-[180px]">
+                      <p className="text-white/30 text-xs font-mono truncate max-w-[200px]">
                         {dep.txHash}
                       </p>
                     </div>
                   </div>
-                  <div className="flex flex-col items-end gap-1.5">
+
+                  <div className="flex items-center gap-3 mt-3 sm:mt-0">
                     <StatusBadge status={dep.status} />
-                    <p className="text-white/25 text-xs">
+
+                    <p className="text-white/30 text-xs">
                       {new Date(dep.createdAt).toLocaleDateString()}
                     </p>
                   </div>
@@ -152,21 +184,22 @@ export default function TransactionsPage() {
             </div>
           )
         ) : subscriptions.length === 0 ? (
-          <div className="empty-state">
-            <Zap size={40} />
-            <p className="text-sm">No subscriptions yet</p>
+          <div className="flex flex-col items-center justify-center py-16 text-white/40">
+            <Zap size={42} />
+            <p className="mt-3 text-sm">No subscriptions yet</p>
           </div>
         ) : (
           <div className="divide-y divide-white/5">
             {subscriptions.map((sub) => (
               <div
                 key={sub._id}
-                className="table-row flex items-center justify-between px-5 py-4"
+                className="flex flex-col sm:flex-row sm:items-center justify-between px-5 py-4 hover:bg-white/[0.02] transition"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-sm bg-violet-500/10 flex items-center justify-center">
                     <Zap size={18} className="text-violet-400" />
                   </div>
+
                   <div>
                     <p className="text-white text-sm font-semibold">
                       {sub.serviceName}
@@ -176,11 +209,13 @@ export default function TransactionsPage() {
                     </p>
                   </div>
                 </div>
-                <div className="flex flex-col items-end gap-1.5">
-                  <span className="text-emerald-400 text-sm font-bold">
+
+                <div className="flex items-center gap-3 mt-3 sm:mt-0">
+                  <span className="text-emerald-400 text-sm font-semibold">
                     +${sub.commissionEarned.toFixed(2)}
                   </span>
-                  <p className="text-white/25 text-xs">
+
+                  <p className="text-white/30 text-xs">
                     {new Date(sub.createdAt).toLocaleDateString()}
                   </p>
                 </div>
@@ -192,4 +227,3 @@ export default function TransactionsPage() {
     </div>
   );
 }
-

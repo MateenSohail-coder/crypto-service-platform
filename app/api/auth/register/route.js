@@ -1,6 +1,8 @@
 import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 import { signToken } from "@/lib/auth";
+import { createAdminNotification } from "@/lib/createNotification";
+import { notifyAdmins } from "@/lib/eventEmitter";
 
 export async function POST(request) {
   try {
@@ -9,7 +11,6 @@ export async function POST(request) {
     const body = await request.json();
     const { name, email, password } = body;
 
-    // Validate input
     if (!name || !email || !password) {
       return Response.json(
         { success: false, message: "All fields are required." },
@@ -24,7 +25,6 @@ export async function POST(request) {
       );
     }
 
-    // Check if email already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return Response.json(
@@ -33,14 +33,27 @@ export async function POST(request) {
       );
     }
 
-    // Create user (password hashed via pre-save hook)
     const user = await User.create({ name, email, password });
 
-    // Sign JWT
     const token = signToken({
       id: user._id,
       email: user.email,
       role: user.role,
+    });
+
+    // ✅ Notify all admins about new user registration
+    await createAdminNotification({
+      title: "New User Registered",
+      message: `${name} (${email}) just created an account.`,
+      type: "new_user",
+      metadata: { userId: user._id, name, email },
+    });
+
+    // Real-time push to online admins
+    notifyAdmins("new_user", {
+      userId: user._id,
+      name,
+      email,
     });
 
     return Response.json(
@@ -54,6 +67,7 @@ export async function POST(request) {
           email: user.email,
           role: user.role,
           balance: user.balance,
+          subscriptionsToday: user.subscriptionsToday,
         },
       },
       { status: 201 },

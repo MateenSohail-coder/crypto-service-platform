@@ -8,7 +8,7 @@ import BottomNav from "@/components/BottomNav";
 import Navbar from "@/components/Navbar";
 
 export default function DashboardLayout({ children }) {
-  const { user, loading } = useAuth();
+  const { user, loading, refreshUser } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -16,6 +16,13 @@ export default function DashboardLayout({ children }) {
       router.push("/login");
     }
   }, [user, loading, router]);
+
+  // ✅ Refresh user balance from server on every dashboard page visit
+  useEffect(() => {
+    if (!loading && user) {
+      refreshUser();
+    }
+  }, [loading]);
 
   if (loading) {
     return (
@@ -31,21 +38,15 @@ export default function DashboardLayout({ children }) {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen ml-96 bg-[#07070f]">
-      {/* Sidebar — desktop */}
+    <div className="min-h-screen bg-[#07070f]">
       <Sidebar />
-
-      {/* Main content */}
-      <div className="lg:pl-64 flex flex-col ml-96 min-h-screen">
+      <div className="lg:pl-64 flex flex-col min-h-screen">
         <Navbar />
         <main className="flex-1 px-4 lg:px-8 py-6 pb-24 lg:pb-8">
           {children}
         </main>
       </div>
-
-      {/* Bottom nav — mobile */}
       <BottomNav />
     </div>
   );
 }
-

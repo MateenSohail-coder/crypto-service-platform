@@ -2,7 +2,30 @@ import connectDB from "@/lib/mongodb";
 import Article from "@/models/Article";
 import { requireAuth, requireAdmin } from "@/middleware/authMiddleware";
 
-// GET - all published articles
+// ── image helper inline ───────────────────────────────────────────────────
+async function processImage(file) {
+  if (!file || file.size === 0) return { base64: null, error: null };
+
+  const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+  if (!allowedTypes.includes(file.type)) {
+    return {
+      base64: null,
+      error: "Only JPG, PNG, and WEBP images are allowed.",
+    };
+  }
+
+  if (file.size > 2 * 1024 * 1024) {
+    return { base64: null, error: "Image must be smaller than 2MB." };
+  }
+
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+  const base64 = `data:${file.type};base64,${buffer.toString("base64")}`;
+
+  return { base64, error: null };
+}
+
+// GET — published articles (authenticated users)
 export async function GET(request) {
   try {
     const { user, response } = await requireAuth(request);
@@ -24,16 +47,19 @@ export async function GET(request) {
   }
 }
 
-// POST - create article (admin only)
+// POST — create article (admin only)
 export async function POST(request) {
   try {
-    const { user: admin, response } = await requireAdmin(request);
+    const { user, response } = await requireAdmin(request);
     if (response) return response;
 
     await connectDB();
 
-    const body = await request.json();
-    const { title, content, excerpt, coverImage, isPublished } = body;
+    const formData = await request.formData();
+    const title = formData.get("title");
+    const content = formData.get("content");
+    const excerpt = formData.get("excerpt") || "";
+    const imageFile = formData.get("coverImage");
 
     if (!title || !content) {
       return Response.json(
@@ -42,17 +68,26 @@ export async function POST(request) {
       );
     }
 
+    const { base64: coverImageBase64, error: imageError } =
+      await processImage(imageFile);
+    if (imageError) {
+      return Response.json(
+        { success: false, message: imageError },
+        { status: 400 },
+      );
+    }
+
     const article = await Article.create({
-      title,
-      content,
-      excerpt: excerpt || content.substring(0, 150) + "...",
-      coverImage: coverImage || "",
-      isPublished: isPublished !== undefined ? isPublished : true,
-      createdBy: admin.id,
+      title: title.trim(),
+      content: content.trim(),
+      excerpt: excerpt.trim() || content.substring(0, 120) + "...",
+      coverImage: coverImageBase64,
+      createdBy: user.id,
+      isPublished: true,
     });
 
     return Response.json(
-      { success: true, message: "Article created successfully.", article },
+      { success: true, message: "Article published successfully.", article },
       { status: 201 },
     );
   } catch (error) {
@@ -64,25 +99,26 @@ export async function POST(request) {
   }
 }
 
-// DELETE - delete article (admin only)
+// DELETE — delete article (admin only)
 export async function DELETE(request) {
   try {
-    const { user: admin, response } = await requireAdmin(request);
+    const { user, response } = await requireAdmin(request);
     if (response) return response;
 
     await connectDB();
 
     const { searchParams } = new URL(request.url);
-    const articleId = searchParams.get("id");
+    const id = searchParams.get("id");
 
-    if (!articleId) {
+    if (!id) {
       return Response.json(
         { success: false, message: "Article ID is required." },
         { status: 400 },
       );
     }
 
-    const article = await Article.findByIdAndDelete(articleId);
+    const article = await Article.findByIdAndDelete(id);
+
     if (!article) {
       return Response.json(
         { success: false, message: "Article not found." },
