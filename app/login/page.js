@@ -261,14 +261,14 @@ export default function LoginPage() {
           {/* Mobile logo */}
           <div className="flex lg:hidden items-center gap-3">
             <div className="w-8 h-8 rounded-sm bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-md shadow-violet-500/20">
-              <ShoppingCart size={14} className="text-white" />
+              <TrendingUp size={14} className="text-white" />
             </div>
             <div className="leading-none">
               <p
                 className="text-white font-black text-lg"
                 style={{ letterSpacing: "-0.04em" }}
               >
-                StockArb
+                Bstock
               </p>
               <p className="text-white/25 text-[9px] tracking-widest uppercase mt-0.5">
                 Investment Platform
@@ -400,7 +400,7 @@ export default function LoginPage() {
           {/* Mobile explainer */}
           <div className="lg:hidden bg-white/[0.02] border border-white/[0.06] rounded-sm p-4 space-y-2.5">
             <p className="text-white/22 text-[10px] uppercase tracking-[0.18em] font-bold">
-              How StockArb Works
+              How Bstock Works
             </p>
             {[
               "We source surplus stock from Amazon, Alibaba & AliExpress at low prices",

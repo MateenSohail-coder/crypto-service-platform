@@ -258,14 +258,14 @@ export default function RegisterPage() {
           {/* Mobile logo */}
           <div className="flex lg:hidden items-center gap-3">
             <div className="w-8 h-8 rounded-sm bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-md shadow-violet-500/20">
-              <ShoppingCart size={14} className="text-white" />
+              <TrendingUp size={14} className="text-white" />
             </div>
             <div className="leading-none">
               <p
                 className="text-white font-black text-lg"
                 style={{ letterSpacing: "-0.04em" }}
               >
-                StockArb
+                Bstock
               </p>
               <p className="text-white/25 text-[9px] tracking-widest uppercase mt-0.5">
                 Investment Platform
@@ -285,7 +285,7 @@ export default function RegisterPage() {
               Create account
             </h1>
             <p className="text-white/35 text-sm">
-              Join StockArb and start earning commissions today.
+              Join Bstock and start earning commissions today.
             </p>
           </div>
 
