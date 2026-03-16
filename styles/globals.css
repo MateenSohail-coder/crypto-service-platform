@@ -813,3 +813,9 @@ body {
 .animate-modal-exit {
   animation: modal-exit 0.2s ease-in forwards;
 }
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}

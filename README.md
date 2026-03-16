@@ -1,36 +1,103 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 🚀 Crypto-Service-Platform
 
-## Getting Started
+**Next.js Crypto Investment Dashboard** - User deposits → subscribe services → earn commissions. Admin approves deposits + manages services.
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## ✨ Features
+```
+🔐 Complete Auth: Register/Login/Reset + JWT + bcrypt
+💰 Deposit System: Crypto txHash → admin approve/reject
+📈 Services: Create/subscribe → daily limits (24/day)
+🔔 Real-time Notifications: SSE (Server-Sent Events)
+👑 Admin Dashboard: Users/Services/Deposits/Articles
+📱 Responsive: Mobile/Desktop + dark theme
+📧 Password Reset: OTP + email (Gmail)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🏗️ Tech Stack
+```
+Frontend: Next.js 14 App Router + React Context + TailwindCSS
+Backend: MongoDB + Mongoose (indexed!)
+Real-time: SSE + EventEmitter (memory-safe)
+Validation: Zod schemas
+Security: Rate-limit ready (Upstash Redis)
+Auth: Custom JWT + middleware
+Email: Nodemailer Gmail
+```
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## 🚀 Quick Start
+```bash
+# Clone & Install
+git clone <repo>
+cd crypto-service-platform
+pnpm install
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Env (.env.local)
+MONGODB_URI=your-mongo-uri
+JWT_SECRET=your-64-char-secret
+GMAIL_USER=your@gmail.com
+GMAIL_APP_PASSWORD=your-app-pass
 
-## Learn More
+# Optional Rate Limit
+UPSTASH_REDIS_URL=...
+UPSTASH_REDIS_TOKEN=...
 
-To learn more about Next.js, take a look at the following resources:
+# Dev
+pnpm dev
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Build/Prod
+pnpm build && pnpm start
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📱 User Flow
+```
+1. /register → Login
+2. /dashboard → View services
+3. Subscribe service (24/day limit)
+4. /deposit → Submit crypto txHash
+5. Admin approves → Real-time notification
+6. Earn commissions!
+```
 
-## Deploy on Vercel
+## 👑 Admin Flow (/admin)
+```
+Users list (paginated)
+Pending deposits → Approve/Reject
+Services CRUD
+Articles publish
+Subscriptions overview
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🔧 Production Hardening (Already Done!)
+```
+✅ DB Indexes: No dupes + fast queries
+✅ API Limits: .limit(50).lean()
+✅ SSE Safe: 1000 max clients + timeout
+✅ Zod: All inputs validated
+✅ Rate-limit: Ready (add Upstash env)
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🧪 Testing
+```bash
+# Invalid deposit → Zod 400
+curl POST /api/deposits/create '{"amount":"abc"}'
+
+# Admin APIs fast
+curl /api/admin/users
+
+# Build test
+pnpm build
+```
+
+## 📁 Structure
+```
+app/                 Next.js routes
+components/          UI
+lib/                 Utils (validators.js, auth.js)
+middleware/          authMiddleware.js + rateLimitMiddleware.js
+models/              Mongoose schemas (indexed!)
+```
+
+## 🤝 Usage Rights
+MIT License - Deploy, modify, commercial use OK!
+
+**Live Demo**: localhost:3000 → Production ready! 🎉

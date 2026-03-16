@@ -1,31 +1,48 @@
 import connectDB from "@/lib/mongodb";
 import Service from "@/models/Service";
 import { requireAuth, requireAdmin } from "@/middleware/authMiddleware";
+import { saveImage, deleteImage } from "@/lib/uploadImage";
 
-// ── image helper inline (no separate file needed) ─────────────────────────
-async function processImage(file) {
-  if (!file || file.size === 0) return { base64: null, error: null };
+function validateServiceData(serviceData) {
+  const errors = [];
 
-  const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-  if (!allowedTypes.includes(file.type)) {
-    return {
-      base64: null,
-      error: "Only JPG, PNG, and WEBP images are allowed.",
-    };
+  if (
+    !serviceData.name ||
+    serviceData.name.trim().length < 1 ||
+    serviceData.name.trim().length > 100
+  ) {
+    errors.push("Service name required (1-100 chars)");
   }
 
-  if (file.size > 2 * 1024 * 1024) {
-    return { base64: null, error: "Image must be smaller than 2MB." };
+  if (
+    !serviceData.description ||
+    serviceData.description.trim().length < 10 ||
+    serviceData.description.trim().length > 1000
+  ) {
+    errors.push("Description required (10-1000 chars)");
   }
 
-  const arrayBuffer = await file.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
-  const base64 = `data:${file.type};base64,${buffer.toString("base64")}`;
+  const price = parseFloat(serviceData.price);
+  if (isNaN(price) || price < 0) {
+    errors.push("Valid price required (>= 0)");
+  }
 
-  return { base64, error: null };
+  const commissionRate = parseFloat(serviceData.commissionRate);
+  if (isNaN(commissionRate) || commissionRate < 0 || commissionRate > 100) {
+    errors.push("Commission rate required (0-100%)");
+  }
+
+  if (errors.length > 0) throw new Error(errors.join("; "));
+
+  return {
+    name: serviceData.name.trim(),
+    description: serviceData.description.trim(),
+    price,
+    commissionRate,
+  };
 }
 
-// GET — all active services (authenticated users)
+// GET — active services (authenticated users)
 export async function GET(request) {
   try {
     const { user, response } = await requireAuth(request);
@@ -33,9 +50,11 @@ export async function GET(request) {
 
     await connectDB();
 
-    const services = await Service.find({ isActive: true }).sort({
-      createdAt: -1,
-    });
+    const services = await Service.find({ isActive: true })
+      .select("name description image price commissionRate isActive createdAt")
+      .sort({ createdAt: -1 })
+      .limit(50)
+      .lean();
 
     return Response.json({ success: true, services }, { status: 200 });
   } catch (error) {
@@ -47,7 +66,7 @@ export async function GET(request) {
   }
 }
 
-// POST — create service (admin only)
+// POST — create service (admin)
 export async function POST(request) {
   try {
     const { user, response } = await requireAdmin(request);
@@ -56,42 +75,16 @@ export async function POST(request) {
     await connectDB();
 
     const formData = await request.formData();
-    const name = formData.get("name");
-    const description = formData.get("description");
-    const price = parseFloat(formData.get("price"));
-    const commissionRate = parseFloat(formData.get("commissionRate"));
+
+    const validated = validateServiceData({
+      name: formData.get("name")?.toString() || "",
+      description: formData.get("description")?.toString() || "",
+      price: formData.get("price")?.toString() || "0",
+      commissionRate: formData.get("commissionRate")?.toString() || "0",
+    });
+
     const imageFile = formData.get("image");
-
-    if (!name || !description || isNaN(price) || isNaN(commissionRate)) {
-      return Response.json(
-        {
-          success: false,
-          message: "Name, description, price and commission rate are required.",
-        },
-        { status: 400 },
-      );
-    }
-
-    if (price < 0) {
-      return Response.json(
-        { success: false, message: "Price cannot be negative." },
-        { status: 400 },
-      );
-    }
-
-    if (commissionRate < 0 || commissionRate > 100) {
-      return Response.json(
-        {
-          success: false,
-          message: "Commission rate must be between 0 and 100.",
-        },
-        { status: 400 },
-      );
-    }
-
-    // Process image
-    const { base64: imageBase64, error: imageError } =
-      await processImage(imageFile);
+    const { url: imageUrl, error: imageError } = await saveImage(imageFile);
     if (imageError) {
       return Response.json(
         { success: false, message: imageError },
@@ -99,29 +92,30 @@ export async function POST(request) {
       );
     }
 
-    const service = await Service.create({
-      name: name.trim(),
-      description: description.trim(),
-      price,
-      commissionRate,
-      image: imageBase64,
+    const newService = await Service.create({
+      ...validated,
+      image: imageUrl, // "/uploads/filename.jpg" or null
       createdBy: user.id,
     });
 
     return Response.json(
-      { success: true, message: "Service created successfully.", service },
+      {
+        success: true,
+        message: "Service created successfully.",
+        service: newService,
+      },
       { status: 201 },
     );
   } catch (error) {
     console.error("Service create error:", error);
     return Response.json(
-      { success: false, message: "Internal server error." },
-      { status: 500 },
+      { success: false, message: error.message || "Internal server error." },
+      { status: 400 },
     );
   }
 }
 
-// PATCH — toggle active/inactive (admin only)
+// PATCH — toggle active/inactive (admin)
 export async function PATCH(request) {
   try {
     const { user, response } = await requireAdmin(request);
@@ -129,8 +123,7 @@ export async function PATCH(request) {
 
     await connectDB();
 
-    const body = await request.json();
-    const { id, isActive } = body;
+    const { id, isActive } = await request.json();
 
     if (!id) {
       return Response.json(
@@ -139,13 +132,13 @@ export async function PATCH(request) {
       );
     }
 
-    const service = await Service.findByIdAndUpdate(
+    const updatedService = await Service.findByIdAndUpdate(
       id,
       { $set: { isActive } },
       { new: true },
     );
 
-    if (!service) {
+    if (!updatedService) {
       return Response.json(
         { success: false, message: "Service not found." },
         { status: 404 },
@@ -156,7 +149,7 @@ export async function PATCH(request) {
       {
         success: true,
         message: `Service ${isActive ? "activated" : "deactivated"}.`,
-        service,
+        service: updatedService,
       },
       { status: 200 },
     );
@@ -169,7 +162,7 @@ export async function PATCH(request) {
   }
 }
 
-// DELETE — delete service (admin only)
+// DELETE — delete service (admin)
 export async function DELETE(request) {
   try {
     const { user, response } = await requireAdmin(request);
@@ -187,14 +180,18 @@ export async function DELETE(request) {
       );
     }
 
-    const service = await Service.findByIdAndDelete(id);
-
+    const service = await Service.findById(id);
     if (!service) {
       return Response.json(
         { success: false, message: "Service not found." },
         { status: 404 },
       );
     }
+
+    // Delete image file from VPS disk
+    deleteImage(service.image);
+
+    await Service.findByIdAndDelete(id);
 
     return Response.json(
       { success: true, message: "Service deleted successfully." },

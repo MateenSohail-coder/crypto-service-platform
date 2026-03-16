@@ -1,29 +1,7 @@
 import connectDB from "@/lib/mongodb";
 import Article from "@/models/Article";
 import { requireAuth, requireAdmin } from "@/middleware/authMiddleware";
-
-// ── image helper inline ───────────────────────────────────────────────────
-async function processImage(file) {
-  if (!file || file.size === 0) return { base64: null, error: null };
-
-  const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-  if (!allowedTypes.includes(file.type)) {
-    return {
-      base64: null,
-      error: "Only JPG, PNG, and WEBP images are allowed.",
-    };
-  }
-
-  if (file.size > 2 * 1024 * 1024) {
-    return { base64: null, error: "Image must be smaller than 2MB." };
-  }
-
-  const arrayBuffer = await file.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
-  const base64 = `data:${file.type};base64,${buffer.toString("base64")}`;
-
-  return { base64, error: null };
-}
+import { saveImage, deleteImage } from "@/lib/uploadImage";
 
 // GET — published articles (authenticated users)
 export async function GET(request) {
@@ -47,7 +25,7 @@ export async function GET(request) {
   }
 }
 
-// POST — create article (admin only)
+// POST — create article (admin)
 export async function POST(request) {
   try {
     const { user, response } = await requireAdmin(request);
@@ -68,8 +46,8 @@ export async function POST(request) {
       );
     }
 
-    const { base64: coverImageBase64, error: imageError } =
-      await processImage(imageFile);
+    const { url: coverImageUrl, error: imageError } =
+      await saveImage(imageFile);
     if (imageError) {
       return Response.json(
         { success: false, message: imageError },
@@ -81,7 +59,7 @@ export async function POST(request) {
       title: title.trim(),
       content: content.trim(),
       excerpt: excerpt.trim() || content.substring(0, 120) + "...",
-      coverImage: coverImageBase64,
+      coverImage: coverImageUrl, // "/uploads/filename.jpg" or null
       createdBy: user.id,
       isPublished: true,
     });
@@ -99,7 +77,7 @@ export async function POST(request) {
   }
 }
 
-// DELETE — delete article (admin only)
+// DELETE — delete article (admin)
 export async function DELETE(request) {
   try {
     const { user, response } = await requireAdmin(request);
@@ -117,14 +95,18 @@ export async function DELETE(request) {
       );
     }
 
-    const article = await Article.findByIdAndDelete(id);
-
+    const article = await Article.findById(id);
     if (!article) {
       return Response.json(
         { success: false, message: "Article not found." },
         { status: 404 },
       );
     }
+
+    // Delete image file from VPS disk
+    deleteImage(article.coverImage);
+
+    await Article.findByIdAndDelete(id);
 
     return Response.json(
       { success: true, message: "Article deleted successfully." },

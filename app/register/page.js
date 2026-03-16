@@ -18,6 +18,7 @@ import {
   Package,
   BadgeDollarSign,
 } from "lucide-react";
+import { TrendingUp } from "lucide-react";
 
 const ONBOARDING_STEPS = [
   {
@@ -161,22 +162,29 @@ export default function RegisterPage() {
         />
 
         {/* Logo */}
-        <div className="relative z-10 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-sm bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
-            <ShoppingCart size={16} className="text-white" />
+        <Link
+          href="/"
+          className="flex items-center gap-3 group transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+        >
+          {/* Logo Icon */}
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-violet-500 via-violet-600 to-indigo-600 flex items-center justify-center shadow-xl shadow-violet-500/30 group-hover:shadow-violet-600/50 group-hover:-translate-y-0.5 transition-all duration-300 border border-white/10">
+            <TrendingUp
+              size={18}
+              className="text-white drop-shadow-sm"
+              strokeWidth={2.2}
+            />
           </div>
-          <div className="leading-none">
-            <p
-              className="text-white font-black text-[1.2rem]"
-              style={{ letterSpacing: "-0.04em" }}
-            >
-              StockArb
+
+          {/* Brand Text */}
+          <div className="leading-tight">
+            <p className="text-white font-black text-[1.15rem] leading-none tracking-[-0.05em] bg-gradient-to-r from-white to-violet-100 bg-clip-text text-transparent">
+              Bstock
             </p>
-            <p className="text-white/25 text-[9px] tracking-[0.22em] uppercase mt-0.5">
+            <p className="text-white/25 text-[9px] font-medium tracking-[0.25em] uppercase mt-1 leading-none">
               Investment Platform
             </p>
           </div>
-        </div>
+        </Link>
 
         {/* Steps */}
         <div className="relative z-10 space-y-7">

@@ -41,6 +41,10 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+// 🚀 PRODUCTION INDEXES - Fast auth + admin dashboard
+UserSchema.index({ email: 1 }, { unique: true });           // Login speedup
+UserSchema.index({ role: 1, createdAt: -1 });              // Admin user list
+
 // ✅ Fixed: no next() needed with async pre-save in ES modules
 UserSchema.pre("save", async function () {
   if (!this.isModified("password")) return;

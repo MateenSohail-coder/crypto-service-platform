@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
+import BottomNav from "@/components/BottomNav";
 
 export default function AdminLayout({ children }) {
   const { user, loading } = useAuth();
@@ -45,6 +46,7 @@ export default function AdminLayout({ children }) {
         <Navbar />
         <main className="flex-1 px-4 lg:px-8 py-6 pb-8">{children}</main>
       </div>
+      <BottomNav />
     </div>
   );
 }

@@ -60,7 +60,7 @@ export default function Sidebar() {
             className="text-white font-bold text-lg tracking-tight"
             style={{ fontFamily: "'Sora', sans-serif" }}
           >
-            NexVault
+            Bstock
           </span>
         </div>
       </div>

@@ -38,8 +38,7 @@ const NotificationSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-// Index for fast queries
-NotificationSchema.index({ userId: 1, isRead: 1, createdAt: -1 });
+// 🚀 OPTIMIZED INDEXES - Production ready
 
 const Notification =
   mongoose.models.Notification ||

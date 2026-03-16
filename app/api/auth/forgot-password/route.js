@@ -62,44 +62,101 @@ export async function POST(request) {
         pass: process.env.GMAIL_APP_PASSWORD,
       },
     });
-
     await transporter.sendMail({
-      from: `"NexVault Security" <${process.env.GMAIL_USER}>`,
+      from: `"Bstock Security" <${process.env.GMAIL_USER}>`,
       to: email,
-      subject: "Your Password Reset Code — NexVault",
+      subject: "Your Password Reset Code — Bstock",
       html: `
-        <div style="max-width:480px;margin:40px auto;font-family:Arial,sans-serif;background:#07070f;padding:32px;border-radius:16px;border:1px solid rgba(255,255,255,0.08);">
-          <div style="text-align:center;margin-bottom:32px;">
-            <div style="background:linear-gradient(135deg,#7c3aed,#4f46e5);width:56px;height:56px;border-radius:14px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:24px;">
-              🔐
-            </div>
-            <h1 style="color:#ffffff;font-size:22px;font-weight:700;margin:0;">Password Reset</h1>
-            <p style="color:rgba(255,255,255,0.4);font-size:14px;margin:8px 0 0;">NexVault Security</p>
-          </div>
+    <!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+</head>
+<body style="margin:0;padding:40px 20px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,'Open Sans','Helvetica Neue',sans-serif;background:#ffffff;line-height:1.6;font-size:16px;">
 
-          <p style="color:rgba(255,255,255,0.7);font-size:15px;line-height:1.6;margin:0 0 24px;">
-            Hi <strong style="color:#fff;">${user.name}</strong>, here is your one-time verification code:
-          </p>
+  <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="max-width:500px;margin:0 auto;">
+    
+    <!-- EXACT Logo Section -->
+    <tr>
+      <td style="padding:24px;border-bottom:1px solid rgba(255,255,255,0.05);background:linear-gradient(135deg,#7c3aed 0%,#4f46e5 100%);border-radius:12px 12px 0 0;text-align:center;">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+          <tr>
+            <td style="vertical-align:middle;padding-right:12px;">
+              <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:inline-block;text-align:center;line-height:32px;box-shadow:0 4px 12px rgba(124,58,237,0.4);">
+                <span style="color:white;font-size:14px;font-weight:bold;vertical-align:middle;">↑</span>
+              </div>
+            </td>
+            <td style="vertical-align:middle;">
+              <span style="color:#ffffff;font-weight:700;font-size:20px;letter-spacing:-0.02em;font-family:'Sora',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;vertical-align:middle;">
+                Bstock
+              </span>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
 
-          <div style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:28px;text-align:center;margin:0 0 24px;">
-            <p style="color:rgba(255,255,255,0.4);font-size:12px;margin:0 0 12px;letter-spacing:2px;text-transform:uppercase;">Your OTP Code</p>
-            <span style="font-size:44px;font-weight:900;letter-spacing:14px;color:#a78bfa;font-family:'Courier New',monospace;">
+    <!-- Header -->
+    <tr>
+      <td style="text-align:center;padding-bottom:40px;">
+        <h1 style="font-size:28px;font-weight:600;color:#111827;margin:0 0 8px 0;">Password Reset Request</h1>
+        <p style="color:#6b7280;font-size:15px;margin:0;">Verification Code</p>
+      </td>
+    </tr>
+
+    <!-- Greeting & Message -->
+    <tr>
+      <td style="padding-bottom:32px;">
+        <p style="color:#374151;font-size:16px;margin:0;">
+          Hello <strong>${user.name}</strong>,<br><br>
+          Please use the one-time verification code below to complete your password reset:
+        </p>
+      </td>
+    </tr>
+
+    <!-- OTP Code -->
+    <tr>
+      <td style="text-align:center;padding-bottom:36px;">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+          <tr>
+            <td style="font-size:48px;font-weight:400;letter-spacing:8px;color:#1f2937;margin:0;padding:24px 20px;background:#e8e9eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.08);line-height:1.2;text-align:center;vertical-align:middle;">
               ${otp}
-            </span>
-          </div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
 
-          <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:14px 16px;margin:0 0 24px;">
-            <p style="color:#fbbf24;font-size:13px;margin:0;">
-              ⏰ This code expires in <strong>10 minutes</strong>. Do not share it with anyone.
-            </p>
-          </div>
+    <!-- Expiration Warning -->
+    <tr>
+      <td style="background:#fef3c7;border-left:4px solid #f59e0b;padding:18px 20px;border-radius:0 6px 6px 0;">
+        <p style="color:#92400e;font-size:14px;margin:0;font-weight:500;line-height:1.5;">
+          This code will expire in <strong>10 minutes</strong>. Do not share it with anyone.
+        </p>
+      </td>
+    </tr>
 
-          <p style="color:rgba(255,255,255,0.25);font-size:12px;text-align:center;margin:0;">
-            If you did not request this, ignore this email. Your account is safe.
-          </p>
-        </div>
-      `,
+    <!-- Footer -->
+    <tr>
+      <td style="text-align:center;padding-top:28px;border-top:1px solid #e5e7eb;">
+        <p style="color:#9ca3af;font-size:13px;margin:0 0 4px;">
+          If you did not request this reset, please ignore this email.
+        </p>
+        <p style="color:#9ca3af;font-size:13px;margin:0;">
+          Your account remains secure.
+        </p>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>
+
+  `,
     });
+
 
     return Response.json(
       {

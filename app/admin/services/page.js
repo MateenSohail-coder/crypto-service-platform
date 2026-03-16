@@ -284,10 +284,10 @@ function CreateServiceModal({ onClose, onCreated }) {
   return (
     <div className="fixed inset-0 animate-modal-enter z-50 flex items-center justify-center p-4">
       <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm pb-40"
         onClick={onClose}
       />
-      <div className="relative z-10 w-full max-w-lg bg-[#0c0c15] border border-white/[0.09] rounded-sm shadow-2xl shadow-black/60 max-h-[90vh] overflow-y-auto">
+      <div className="relative z-10 w-full max-w-lg bg-[#0c0c15] border border-white/[0.09] rounded-sm shadow-2xl shadow-black/60 max-h-[90vh] overflow-y-auto pb-40">
         {/* Modal header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.07] sticky top-0 bg-[#0c0c15] z-10">
           <div className="flex items-center gap-2">

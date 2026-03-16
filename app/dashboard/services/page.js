@@ -9,6 +9,8 @@ import {
   TrendingUp,
   Loader2,
   Lock,
+  ShieldX,
+  ZapOff,
 } from "lucide-react";
 
 /* ───────────────── SERVICE CARD ───────────────── */
@@ -328,7 +330,7 @@ export default function ServicesPage() {
 
       {/* modal */}
 
-      {selectedService && (
+      {selectedService ? (
         <div className="fixed inset-0 h-screen bg-black/70 backdrop-blur-sm flex items-center justify-center z-[200] p-4 transition-opacity duration-200">
           <div
             className={`bg-[#0f0f1a] border border-white/10 rounded-sm w-full max-w-2xl
@@ -424,6 +426,18 @@ export default function ServicesPage() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-20 space-y-6">
+          <div className="w-32 h-32 rounded-sm bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center border-2 border-dashed border-gray-600">
+            <ShieldX className="w-20 h-20 text-gray-500" strokeWidth={1.5} />
+          </div>
+          <div className="text-center space-y-2">
+            <h2 className="text-2xl font-bold text-white">No Service Yet</h2>
+            <p className="text-gray-400 text-lg max-w-md">
+              No services are currently available.
+            </p>
           </div>
         </div>
       )}

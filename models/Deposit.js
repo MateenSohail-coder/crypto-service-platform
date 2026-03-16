@@ -35,7 +35,12 @@ const DepositSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-const Deposit =
-  mongoose.models.Deposit || mongoose.model("Deposit", DepositSchema);
+// 🚀 PRODUCTION INDEXES - Prevent duplicates + speed up queries
+DepositSchema.index({ txHash: 1 }, { unique: true });  // Prevent duplicate deposits
+DepositSchema.index({ userId: 1, createdAt: -1 });     // Fast user deposit history
+DepositSchema.index({ status: 1, reviewedAt: -1 });     // Fast admin pending queue
+
+const Deposit = mongoose.models.Deposit || mongoose.model("Deposit", DepositSchema);
 
 export default Deposit;
+

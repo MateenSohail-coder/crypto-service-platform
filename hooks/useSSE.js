@@ -60,7 +60,7 @@ export function useSSE(handlers, enabled = true) {
         connect();
       }, reconnectDelay.current);
     };
-  }, [enabled]);
+  }, []); // Remove enabled from deps to fix hoisting/circular call issue
 
   useEffect(() => {
     if (enabled) {

@@ -120,19 +120,19 @@ export default function TransactionsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border border-white/10 p-1 rounded-sm w-fit bg-[#0f0f1a]">
+      <div className="flex gap-1 border border-white/10 p-1 rounded-sm bg-[#0f0f1a] w-fit max-w-full overflow-x-auto scrollbar-none">
         {tabs.map((t) => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
-            className={`flex items-center gap-2 px-4 py-2 text-sm rounded-sm transition ${
+            className={`flex items-center gap-1.5 px-3 py-2 text-sm rounded-sm transition whitespace-nowrap flex-shrink-0 ${
               tab === t.key
                 ? "bg-violet-600 text-white"
                 : "text-white/60 hover:text-white hover:bg-white/5"
             }`}
           >
-            <t.icon size={14} />
-            {t.label}
+            <t.icon size={13} />
+            <span className="inline">{t.label}</span>
             <span className="text-xs opacity-60">({t.count})</span>
           </button>
         ))}

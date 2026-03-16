@@ -225,7 +225,7 @@ export default function Navbar() {
             {open && (
               <>
                 {/* Mobile backdrop overlay */}
-                <div className="fixed inset-0 bg-black/50 z-40 sm:hidden" />
+                <div className="fixed inset-0 animate-modal-enter bg-black/50 z-40 sm:hidden" />
 
                 {/* Dropdown panel
                     - Mobile: fixed, centered horizontally, near top
@@ -284,7 +284,7 @@ export default function Navbar() {
                       {/* Close button — always visible, pushed to the right */}
                       <button
                         onClick={() => setOpen(false)}
-                        className="ml-auto text-white/40 hover:text-white border border-white/40 p-1 rounded-sm transition-colors sm:ml-0"
+                        className="ml-auto text-white/40 hover:text-white border border-white/40 p-1 cursor-pointer rounded-sm transition-colors sm:ml-0"
                       >
                         <X size={19} />
                       </button>

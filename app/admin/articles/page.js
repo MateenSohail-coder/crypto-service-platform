@@ -319,12 +319,12 @@ function CreateArticleModal({ onClose, onCreated }) {
   };
 
   return (
-    <div className="fixed animate-modal-enter inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed animate-modal-enter inset-0 z-50  flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative z-10 w-full max-w-2xl bg-[#0c0c15] border border-white/[0.09] rounded-sm shadow-2xl shadow-black/60 max-h-[90vh] overflow-y-auto">
+      <div className="relative z-10 w-full max-w-2xl pb-40 bg-[#0c0c15] border border-white/[0.09] rounded-sm shadow-2xl shadow-black/60 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.07] sticky top-0 bg-[#0c0c15] z-10">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-sm bg-emerald-500/15 border border-emerald-500/20 flex items-center justify-center">
