@@ -24,8 +24,12 @@ const ArticleSchema = new mongoose.Schema(
       default: "",
     },
 
-    // Stores "/uploads/filename.jpg" — NOT base64
-    coverImage: {
+    // Cloudinary image data
+    coverImageUrl: {
+      type: String,
+      default: null,
+    },
+    coverImagePublicId: {
       type: String,
       default: null,
     },

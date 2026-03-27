@@ -18,8 +18,12 @@ const ServiceSchema = new mongoose.Schema(
       maxlength: [1000, "Description cannot exceed 1000 characters."],
     },
 
-    // Stores "/uploads/filename.jpg" — NOT base64
-    image: {
+    // Cloudinary image data
+    imageUrl: {
+      type: String,
+      default: null,
+    },
+    imagePublicId: {
       type: String,
       default: null,
     },

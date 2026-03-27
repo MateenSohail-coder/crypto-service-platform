@@ -13,6 +13,7 @@ export async function GET(request) {
 
     const articles = await Article.find({ isPublished: true })
       .populate("createdBy", "name")
+      .select("title content excerpt coverImageUrl createdAt")
       .sort({ createdAt: -1 });
 
     return Response.json({ success: true, articles }, { status: 200 });
@@ -46,8 +47,11 @@ export async function POST(request) {
       );
     }
 
-    const { url: coverImageUrl, error: imageError } =
-      await saveImage(imageFile);
+    const {
+      url: coverImageUrl,
+      publicId: coverImagePublicId,
+      error: imageError,
+    } = await saveImage(imageFile);
     if (imageError) {
       return Response.json(
         { success: false, message: imageError },
@@ -59,7 +63,8 @@ export async function POST(request) {
       title: title.trim(),
       content: content.trim(),
       excerpt: excerpt.trim() || content.substring(0, 120) + "...",
-      coverImage: coverImageUrl, // "/uploads/filename.jpg" or null
+      coverImageUrl,
+      coverImagePublicId,
       createdBy: user.id,
       isPublished: true,
     });
@@ -104,7 +109,7 @@ export async function DELETE(request) {
     }
 
     // Delete image file from VPS disk
-    deleteImage(article.coverImage);
+    deleteImage(article.coverImagePublicId);
 
     await Article.findByIdAndDelete(id);
 

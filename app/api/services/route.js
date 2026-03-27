@@ -51,7 +51,9 @@ export async function GET(request) {
     await connectDB();
 
     const services = await Service.find({ isActive: true })
-      .select("name description image price commissionRate isActive createdAt")
+      .select(
+        "name description imageUrl price commissionRate isActive createdAt",
+      )
       .sort({ createdAt: -1 })
       .limit(50)
       .lean();
@@ -84,7 +86,11 @@ export async function POST(request) {
     });
 
     const imageFile = formData.get("image");
-    const { url: imageUrl, error: imageError } = await saveImage(imageFile);
+    const {
+      url: imageUrl,
+      publicId: imagePublicId,
+      error: imageError,
+    } = await saveImage(imageFile);
     if (imageError) {
       return Response.json(
         { success: false, message: imageError },
@@ -94,7 +100,8 @@ export async function POST(request) {
 
     const newService = await Service.create({
       ...validated,
-      image: imageUrl, // "/uploads/filename.jpg" or null
+      imageUrl,
+      imagePublicId,
       createdBy: user.id,
     });
 
@@ -189,7 +196,7 @@ export async function DELETE(request) {
     }
 
     // Delete image file from VPS disk
-    deleteImage(service.image);
+    deleteImage(service.imagePublicId);
 
     await Service.findByIdAndDelete(id);
 

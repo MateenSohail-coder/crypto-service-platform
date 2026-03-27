@@ -94,10 +94,10 @@ function ServiceCard({ service, onDelete, onToggle, deleting, toggling }) {
           : "border-white/4 opacity-60"
       }`}
     >
-      {service.image ? (
+      {service.imageUrl || service.image ? (
         <div className="w-full h-40 overflow-hidden">
           <img
-            src={service.image}
+            src={service.imageUrl || service.image}
             alt={service.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />

@@ -105,13 +105,14 @@ function ArticlePreviewModal({ article, onClose }) {
       <div className="relative z-10 w-full max-w-2xl max-h-[92vh] flex flex-col bg-[#08080f] border border-white/[0.08] rounded-sm shadow-2xl shadow-black/80 overflow-hidden">
         {/* Hero image or gradient header */}
         <div className="relative flex-shrink-0">
-          {article.coverImage ? (
+          {article.coverImageUrl || article.coverImage ? (
             <div className="relative h-56 overflow-hidden">
               <img
-                src={article.coverImage}
+                src={article.coverImageUrl || article.coverImage}
                 alt={article.title}
                 className="w-full h-full object-cover"
               />
+
               {/* Gradient overlay so title is always readable */}
               <div className="absolute inset-0 bg-gradient-to-t from-[#08080f] via-[#08080f]/40 to-transparent" />
             </div>
@@ -630,9 +631,9 @@ export default function AdminArticlesPage() {
                   {/* Desktop row */}
                   <div className="hidden sm:grid grid-cols-[auto_1fr_160px_80px] px-5 py-4 gap-4 items-center">
                     <div className="w-16 h-12 rounded-sm overflow-hidden flex-shrink-0">
-                      {article.coverImage ? (
+                      {article.coverImageUrl || article.coverImage ? (
                         <img
-                          src={article.coverImage}
+                          src={article.coverImageUrl || article.coverImage}
                           alt={article.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />

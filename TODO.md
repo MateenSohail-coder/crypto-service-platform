@@ -1,16 +1,14 @@
-# Crypto Service Platform - Production Fix TODO
+  # Cloudinary Image Upload Integration TODO
 
-## Current Task: Fix Build Errors & Production-Ready
-- [x] 1. ✅ Create this TODO.md
-- [x] 2. Fix models/Deposit.js (add model export)
-- [x] 3. Audit other models (Notification.js, OTP.js, Subscription.js, Article.js) - ✅ All exports already correct, no changes needed
-- [x] 4. Run `pnpm lint` - ✅ Passed (no errors)
-- [x] 5. Run `pnpm build` - ✅ Production build passes
-- [ ] 6. Test runtime: `pnpm dev`, check deposits flow
-- [ ] 7. Production hardening: Add rate limits, security headers, env validation
-
-## Next Enhancements
-- Add Redis caching for admin dashboard
-- Implement webhook for auto-deposit approval
-- Add wallet connect integration
-- Performance: Add more indexes, query optimization
+1. ✅ **Install Cloudinary dependency** `cd crypto-service-platform && pnpm add cloudinary`
+2. ✅ **Update .env.local** - Add Cloudinary environment variables
+3. ✅ **Replace lib/uploadImage.js** - Implement Cloudinary upload/download functions
+4. ✅ **Update models/Service.js** - Replace image field with imageUrl/imagePublicId
+5. ✅ **Update models/Article.js** - Replace coverImage with coverImageUrl/coverImagePublicId
+6. ✅ **Update api/services/route.js** - Modify create/delete to use new fields/functions
+7. ✅ **Update api/articles/route.js** - Modify create/delete to use new fields/functions
+8. **Test create service** via admin panel
+9. **Test create article** via admin panel  
+10. **Test delete service/article** - verify Cloudinary cleanup
+11. **Verify frontend display** - image URLs work seamlessly
+12. **Mark complete**

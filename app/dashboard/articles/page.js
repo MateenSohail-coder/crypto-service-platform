@@ -37,10 +37,10 @@ function ArticleCard({ article, onClick }) {
       className="bg-[#0f0f1a] border border-white/10 rounded-sm overflow-hidden hover:border-violet-500/30 hover:shadow-xl hover:shadow-black/30 transition-all duration-300 cursor-pointer group flex flex-col"
     >
       {/* Cover Image */}
-      {article.coverImage ? (
+      {article.coverImageUrl || article.coverImage ? (
         <div className="w-full h-48 overflow-hidden">
           <img
-            src={article.coverImage}
+            src={article.coverImageUrl || article.coverImage}
             alt={article.title}
             className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
           />
@@ -241,13 +241,14 @@ export default function ArticlesPage() {
           <div className="bg-[#08080f] border border-white/[0.08] rounded-sm w-full max-w-2xl max-h-[92vh] flex flex-col shadow-2xl shadow-black/80 overflow-hidden">
             {/* Hero */}
             <div className="relative flex-shrink-0">
-              {selected.coverImage ? (
+              {selected.coverImageUrl || selected.coverImage ? (
                 <div className="relative h-56 overflow-hidden">
                   <img
-                    src={selected.coverImage}
+                    src={selected.coverImageUrl || selected.coverImage}
                     alt={selected.title}
                     className="w-full h-full object-cover"
                   />
+
                   <div className="absolute inset-0 bg-gradient-to-t from-[#08080f] via-[#08080f]/40 to-transparent" />
                 </div>
               ) : (

@@ -16,21 +16,28 @@ import {
 /* ───────────────── SERVICE CARD ───────────────── */
 
 function ServiceCard({ service, openModal }) {
+  const imgSrc = service.imageUrl || service.image;
+  const [imgError, setImgError] = useState(false);
+
+  const imageElement =
+    !imgSrc || imgError ? (
+      <div className="w-full h-full bg-gradient-to-br from-violet-500/10 to-indigo-500/10 flex items-center justify-center">
+        <Layers className="text-violet-400/50" size={26} />
+      </div>
+    ) : (
+      <img
+        src={imgSrc}
+        alt={service.name}
+        className="w-full h-full object-cover"
+        onError={() => setImgError(true)}
+      />
+    );
+
   return (
     <div className="bg-[#0f0f1a] border border-white/10 rounded-sm overflow-hidden hover:border-violet-500/40 transition-all duration-300 flex flex-col md:flex-row">
       {/* image */}
       <div className="w-full md:w-64 h-48 md:h-auto flex-shrink-0 overflow-hidden">
-        {service.image ? (
-          <img
-            src={service.image}
-            alt={service.name}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-violet-500/10 to-indigo-500/10 flex items-center justify-center">
-            <Layers className="text-violet-400/50" size={26} />
-          </div>
-        )}
+        {imageElement}
       </div>
 
       {/* content */}
@@ -316,6 +323,18 @@ export default function ServicesPage() {
         <div className="flex justify-center py-20">
           <Loader2 className="animate-spin text-violet-400" />
         </div>
+      ) : services.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 space-y-6">
+          <div className="w-32 h-32 rounded-sm bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center border-2 border-dashed border-gray-600">
+            <ShieldX className="w-20 h-20 text-gray-500" strokeWidth={1.5} />
+          </div>
+          <div className="text-center space-y-2">
+            <h2 className="text-2xl font-bold text-white">No Service Yet</h2>
+            <p className="text-gray-400 text-lg max-w-md">
+              No services are currently available.
+            </p>
+          </div>
+        </div>
       ) : (
         <div className="flex flex-col gap-5">
           {services.map((service) => (
@@ -330,23 +349,25 @@ export default function ServicesPage() {
 
       {/* modal */}
 
-      {selectedService ? (
+      {selectedService && (
         <div className="fixed inset-0 h-screen bg-black/70 backdrop-blur-sm flex items-center justify-center z-[200] p-4 transition-opacity duration-200">
           <div
             className={`bg-[#0f0f1a] border border-white/10 rounded-sm w-full max-w-2xl
         ${closingModal ? "animate-modal-exit" : "animate-modal-enter"}`}
           >
             <div className="flex flex-col md:flex-row p-4 md:p-6 gap-4 md:gap-6">
-              {/* Left: Image */}
-              {selectedService.image && (
-                <div className="flex-shrink-0 w-full md:w-32 h-48 md:h-32 overflow-hidden rounded-sm">
+              {/* Left: Image - FIXED */}
+              <div className="flex-shrink-0 w-full md:w-32 h-48 md:h-32 overflow-hidden rounded-sm bg-gray-900 flex items-center justify-center">
+                {selectedService.imageUrl || selectedService.image ? (
                   <img
-                    src={selectedService.image}
+                    src={selectedService.imageUrl || selectedService.image}
                     alt={selectedService.name}
                     className="w-full h-full object-cover"
                   />
-                </div>
-              )}
+                ) : (
+                  <Layers className="text-gray-500" size={24} />
+                )}
+              </div>
 
               {/* Right: Content */}
               <div className="flex-1 flex flex-col gap-4">
@@ -426,18 +447,6 @@ export default function ServicesPage() {
                 </button>
               </div>
             </div>
-          </div>
-        </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center py-20 space-y-6">
-          <div className="w-32 h-32 rounded-sm bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center border-2 border-dashed border-gray-600">
-            <ShieldX className="w-20 h-20 text-gray-500" strokeWidth={1.5} />
-          </div>
-          <div className="text-center space-y-2">
-            <h2 className="text-2xl font-bold text-white">No Service Yet</h2>
-            <p className="text-gray-400 text-lg max-w-md">
-              No services are currently available.
-            </p>
           </div>
         </div>
       )}
