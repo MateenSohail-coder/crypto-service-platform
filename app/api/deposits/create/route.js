@@ -1,8 +1,9 @@
 import connectDB from "@/lib/mongodb";
-import Deposit from "@/models/Deposit";
+import * as DepositModel from "@/models/Deposit";
 import { requireAuth } from "@/middleware/authMiddleware";
 import { notifyAdmins } from "@/lib/eventEmitter";
 import { createAdminNotification } from "@/lib/createNotification";
+import { saveImage } from "@/lib/uploadImage";
 
 export async function POST(request) {
   try {
@@ -11,8 +12,12 @@ export async function POST(request) {
 
     await connectDB();
 
-    const body = await request.json();
-    const { amount, txHash } = body;
+    const formData = await request.formData();
+    const amountStr = formData.get("amount");
+    const txHash = formData.get("txHash");
+    const screenshotFile = formData.get("screenshot");
+
+    const amount = parseFloat(amountStr);
 
     if (!amount || !txHash) {
       return Response.json(
@@ -24,7 +29,7 @@ export async function POST(request) {
       );
     }
 
-    if (typeof amount !== "number" || amount <= 0) {
+    if (isNaN(amount) || amount <= 0) {
       return Response.json(
         { success: false, message: "Amount must be a positive number." },
         { status: 400 },
@@ -38,7 +43,9 @@ export async function POST(request) {
       );
     }
 
-    const existing = await Deposit.findOne({ txHash: txHash.trim() });
+    const existing = await DepositModel.default.findOne({
+      txHash: txHash.trim(),
+    });
     if (existing) {
       return Response.json(
         {
@@ -49,19 +56,45 @@ export async function POST(request) {
       );
     }
 
-    const deposit = await Deposit.create({
+    // Screenshot is REQUIRED
+    if (!screenshotFile || screenshotFile.size === 0) {
+      return Response.json(
+        { success: false, message: "Screenshot proof is required." },
+        { status: 400 },
+      );
+    }
+
+    let screenshotUrl = null;
+    let screenshotPublicId = null;
+    const { url, publicId, error } = await saveImage(screenshotFile);
+    if (error) {
+      return Response.json({ success: false, message: error }, { status: 400 });
+    }
+    screenshotUrl = url;
+    screenshotPublicId = publicId;
+
+    const deposit = await DepositModel.default.create({
       userId: user.id,
       amount,
       txHash: txHash.trim(),
       status: "pending",
+      screenshotUrl,
+      screenshotPublicId,
+      screenshotUploadedAt: screenshotUrl ? new Date() : null,
     });
 
-    // ✅ Save persistent notification in DB for all admins
+    // ✅ Save persistent notification in DB for all admins (include screenshot info)
     await createAdminNotification({
       title: "New Deposit Request",
-      message: `A user submitted a deposit of $${amount}. Review required.`,
+      message: `$${amount} deposit with screenshot proof. Review required.`,
       type: "new_deposit",
-      metadata: { depositId: deposit._id, amount, txHash: txHash.trim() },
+      metadata: {
+        depositId: deposit._id,
+        amount,
+        txHash: txHash.trim(),
+        screenshotUrl,
+        hasScreenshot: !!screenshotUrl,
+      },
     });
 
     // ✅ Also push real-time SSE to online admins
@@ -70,6 +103,8 @@ export async function POST(request) {
       amount: deposit.amount,
       txHash: deposit.txHash,
       userId: user.id,
+      screenshotUrl,
+      hasScreenshot: !!screenshotUrl,
     });
 
     return Response.json(
@@ -96,7 +131,7 @@ export async function GET(request) {
 
     await connectDB();
 
-    const deposits = await Deposit.find({ userId: user.id }).sort({
+    const deposits = await DepositModel.default.find({ userId: user.id }).sort({
       createdAt: -1,
     });
 

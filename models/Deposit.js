@@ -31,6 +31,19 @@ const DepositSchema = new mongoose.Schema(
       ref: "User",
       default: null,
     },
+    // Screenshot proof fields
+    screenshotUrl: {
+      type: String,
+      default: null,
+    },
+    screenshotPublicId: {
+      type: String,
+      default: null,
+    },
+    screenshotUploadedAt: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true },
 );

@@ -57,6 +57,8 @@ export default function DepositPage() {
   const [selectedMethod, setSelectedMethod] = useState(PAYMENT_METHODS[0]);
   const [amount, setAmount] = useState("");
   const [txHash, setTxHash] = useState("");
+  const [screenshot, setScreenshot] = useState(null);
+  const [screenshotPreview, setScreenshotPreview] = useState(null);
   const [formLoading, setFormLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -94,13 +96,41 @@ export default function DepositPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleScreenshotChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file
+      if (!file.type.startsWith("image/")) {
+        setError("Please select a valid image file (JPG, PNG, WEBP).");
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        // 5MB
+        setError("Screenshot must be under 5MB.");
+        return;
+      }
+      setScreenshot(file);
+      const preview = URL.createObjectURL(file);
+      setScreenshotPreview(preview);
+      setError("");
+    }
+  };
+
+  const removeScreenshot = () => {
+    setScreenshot(null);
+    setScreenshotPreview(null);
+    if (document.querySelector("#screenshot-input")) {
+      document.querySelector("#screenshot-input").value = "";
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
-    if (!amount || !txHash) {
-      setError("Please fill in all fields.");
+    if (!amount || !txHash || !screenshot) {
+      setError("Please fill in all fields including screenshot proof.");
       return;
     }
 
@@ -118,17 +148,17 @@ export default function DepositPage() {
     setFormLoading(true);
     try {
       const token = localStorage.getItem("token");
+      const formData = new FormData();
+      formData.append("amount", parsedAmount);
+      formData.append("txHash", txHash.trim());
+      formData.append("screenshot", screenshot);
+
       const res = await fetch("/api/deposits/create", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          amount: parsedAmount,
-          txHash: txHash.trim(),
-          method: selectedMethod.name,
-        }),
+        body: formData,
       });
       const data = await res.json();
       if (!data.success) {
@@ -139,6 +169,8 @@ export default function DepositPage() {
       setSuccess("Deposit submitted! Awaiting admin approval.");
       setAmount("");
       setTxHash("");
+      setScreenshot(null);
+      setScreenshotPreview(null);
       fetchDeposits();
     } catch {
       setError("Network error. Please try again.");
@@ -368,6 +400,39 @@ export default function DepositPage() {
                   placeholder="Paste your transaction hash..."
                   className="w-full bg-white/[0.03] border border-white/10 px-4 py-3.5 text-white text-sm placeholder-white/20 focus:outline-none focus:border-violet-500 focus:bg-white/[0.05] transition-all rounded-0 font-mono"
                 />
+              </div>
+
+              {/* Screenshot Proof */}
+              <div>
+                <label className="block text-white/50 text-xs mb-2 font-medium uppercase">
+                  Payment Screenshot *REQUIRED*
+                </label>
+                <div className="space-y-2">
+                  <input
+                    id="screenshot-input"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleScreenshotChange}
+                    className="w-full bg-white/[0.03] border border-white/10 px-4 py-3.5 text-white text-sm placeholder-white/20 focus:outline-none focus:border-violet-500 focus:bg-white/[0.05] transition-all rounded-0 file:bg-violet-600/50 file:backdrop-blur-sm file:border-0 file:text-white file:px-4 file:py-2 file:rounded-md file:cursor-pointer file:mr-4 file:hover:bg-violet-500 file:transition-all hover:border-violet-500/50"
+                  />
+                  {screenshotPreview && (
+                    <div className="relative group bg-black/20 border border-white/10 p-2 rounded-md max-w-[200px]">
+                      <img
+                        src={screenshotPreview}
+                        alt="Screenshot preview"
+                        className="w-full h-24 object-cover rounded-md"
+                      />
+                      <button
+                        type="button"
+                        onClick={removeScreenshot}
+                        className="absolute -top-2 -right-2 w-6 h-6 bg-red-500/90 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-all"
+                      />
+                    </div>
+                  )}
+                  <p className="text-white/40 text-xs">
+                    Upload screenshot proof of payment (JPG/PNG/WEBP, max 5MB)
+                  </p>
+                </div>
               </div>
 
               {/* Error / Success Messages */}
