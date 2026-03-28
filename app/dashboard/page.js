@@ -325,7 +325,7 @@ export default function DashboardPage() {
                   className="text-white font-black text-xl leading-none"
                   style={{ letterSpacing: "-0.04em" }}
                 >
-                  NEXUS
+                  Bstocks
                 </p>
                 <p className="text-violet-300/55 text-[8px] tracking-[0.25em] uppercase font-medium mt-0.5">
                   Wealth Platform
