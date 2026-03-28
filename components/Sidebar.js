@@ -16,10 +16,13 @@ import {
   TrendingUp,
 } from "lucide-react";
 
+import { ArrowUpCircle } from "lucide-react";
+
 const userLinks = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/dashboard/services", label: "Services", icon: Layers },
   { href: "/dashboard/deposit", label: "Deposit", icon: ArrowDownCircle },
+  { href: "/dashboard/withdrawal", label: "Withdrawal", icon: ArrowUpCircle },
   { href: "/dashboard/transactions", label: "Transactions", icon: Receipt },
   { href: "/dashboard/articles", label: "Articles", icon: BookOpen },
   { href: "/dashboard/profile", label: "Profile", icon: User },
@@ -29,6 +32,7 @@ const adminLinks = [
   { href: "/admin", label: "Overview", icon: ShieldCheck },
   { href: "/admin/users", label: "Users", icon: User },
   { href: "/admin/deposits", label: "Deposits", icon: ArrowDownCircle },
+  { href: "/admin/withdrawals", label: "Withdrawals", icon: ArrowUpCircle },
   { href: "/admin/services", label: "Services", icon: Layers },
   { href: "/admin/articles", label: "Articles", icon: BookOpen },
   { href: "/admin/subscriptions", label: "Subscriptions", icon: Activity },

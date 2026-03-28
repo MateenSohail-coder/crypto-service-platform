@@ -77,7 +77,7 @@ export default function NotificationProvider({ children }) {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  // SSE event handlers
+  // SSE event handlers - EXTENDED for withdrawals
   const handlers = useCallback(
     () => ({
       // ---- ADMIN EVENTS ----
@@ -90,13 +90,25 @@ export default function NotificationProvider({ children }) {
           title: "New Deposit Request",
           message: `$${data.amount} deposit submitted. Review required.`,
         });
-        // Trigger global event so admin deposit page refreshes
         window.dispatchEvent(
           new CustomEvent("sse:new_deposit", { detail: data }),
         );
       },
 
-      // Admin receives: deposit was reviewed (keeps admin list in sync across tabs)
+      // Admin receives: new withdrawal request
+      new_withdrawal: (data) => {
+        if (user?.role !== "admin") return;
+        addToast({
+          type: "warning",
+          title: "New Withdrawal Request",
+          message: `$${data.amount} withdrawal requested. Review required.`,
+        });
+        window.dispatchEvent(
+          new CustomEvent("sse:new_withdrawal", { detail: data }),
+        );
+      },
+
+      // Admin receives: deposit/withdrawal reviewed
       deposit_reviewed: (data) => {
         if (user?.role !== "admin") return;
         window.dispatchEvent(
@@ -104,33 +116,66 @@ export default function NotificationProvider({ children }) {
         );
       },
 
+      withdrawal_reviewed: (data) => {
+        if (user?.role !== "admin") return;
+        window.dispatchEvent(
+          new CustomEvent("sse:withdrawal_reviewed", { detail: data }),
+        );
+      },
+
       // ---- USER EVENTS ----
 
-      // User receives: their deposit was approved
+      // User receives: deposit approved
       deposit_approved: async (data) => {
         if (user?.role === "admin") return;
         addToast({
           type: "success",
           title: "Deposit Approved! 🎉",
-          message: `$${data.amount} has been added to your balance. New balance: $${data.newBalance?.toFixed(2)}`,
+          message: `$${data.amount} added to your balance. New balance: $${data.newBalance?.toFixed(2)}`,
         });
-        // ✅ Instantly refresh balance in the UI
         await refreshUser();
         window.dispatchEvent(
           new CustomEvent("sse:deposit_approved", { detail: data }),
         );
       },
 
-      // User receives: their deposit was rejected
+      // User receives: withdrawal approved
+      withdrawal_approved: async (data) => {
+        if (user?.role === "admin") return;
+        addToast({
+          type: "success",
+          title: "Withdrawal Approved! 🎉",
+          message: `$${data.amount} withdrawn to your wallet. New balance: $${data.newBalance?.toFixed(2)}`,
+        });
+        await refreshUser();
+        window.dispatchEvent(
+          new CustomEvent("sse:withdrawal_approved", { detail: data }),
+        );
+      },
+
+      // User receives: deposit rejected
       deposit_rejected: (data) => {
         if (user?.role === "admin") return;
         addToast({
           type: "error",
           title: "Deposit Rejected",
-          message: `Your deposit of $${data.amount} was rejected. Please contact support.`,
+          message: `Your $${data.amount} deposit was rejected. Contact support.`,
         });
         window.dispatchEvent(
           new CustomEvent("sse:deposit_rejected", { detail: data }),
+        );
+      },
+
+      // User receives: withdrawal rejected
+      withdrawal_rejected: (data) => {
+        if (user?.role === "admin") return;
+        addToast({
+          type: "error",
+          title: "Withdrawal Rejected",
+          message: `Your $${data.amount} withdrawal was rejected. Contact support.`,
+        });
+        window.dispatchEvent(
+          new CustomEvent("sse:withdrawal_rejected", { detail: data }),
         );
       },
     }),

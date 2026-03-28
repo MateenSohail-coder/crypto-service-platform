@@ -14,22 +14,24 @@ import {
   Activity,
 } from "lucide-react";
 
+import { ArrowUpCircle } from "lucide-react";
+
 const userLinks = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
   { href: "/dashboard/services", label: "Services", icon: Layers },
   { href: "/dashboard/deposit", label: "Deposit", icon: ArrowDownCircle },
+  { href: "/dashboard/withdrawal", label: "Withdrawal", icon: ArrowUpCircle },
   { href: "/dashboard/transactions", label: "History", icon: Receipt },
   { href: "/dashboard/articles", label: "Articles", icon: BookOpen },
-  { href: "/dashboard/profile", label: "Profile", icon: User },
 ];
 
 const adminLinks = [
   { href: "/admin", label: "Overview", icon: ShieldCheck },
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/deposits", label: "Deposits", icon: ArrowDownCircle },
+  { href: "/admin/withdrawals", label: "Withdrawals", icon: ArrowUpCircle },
   { href: "/admin/subscriptions", label: "Subs", icon: Activity },
   { href: "/admin/services", label: "Services", icon: Layers },
-  { href: "/admin/articles", label: "Articles", icon: BookOpen },
 ];
 
 export default function BottomNav() {
