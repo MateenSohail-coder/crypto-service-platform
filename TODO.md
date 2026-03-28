@@ -1,16 +1,11 @@
-# Admin Deposits Page Responsiveness Task
+# Fix Next.js Build Errors - Progress Tracker
 
-## Status: ✅ In Progress
+## Plan Breakdown:
+- [x] 1. Create TODO.md with steps
+- [ ] 2. Fix app/dashboard/transactions/page.js (4 broken className quotes)
+- [ ] 3. Fix other affected files from search results (app/admin/*, app/dashboard/withdrawal/page.js)
+- [ ] 4. Run `pnpm build` to verify
+- [ ] 5. Complete task
 
-### Step 1: [TODO] Create TODO.md - Track planning ✅ Complete
-### Step 2: ✅ Enhance ScreenshotPreview component for perfect centering, modern UI, hover effects
-### Step 3: ✅ Improve Header responsiveness (gaps, text scaling)
-### Step 4: ✅ Update Tabs for better wrapping/padding
-### Step 5: ✅ Enhance Deposits container with scroll handling
-### Step 6: ✅ Optimize Desktop grid for tablets/desktop (md: variants)
-### Step 7: [TODO] Refine Mobile cards spacing and layout
-### Step 8: [TODO] Add general responsive utilities and test
-### Step 9: [TODO] Test across devices, update TODO.md, attempt completion
-
-**Next:** Implement Step 2 - ScreenshotPreview enhancements.
+**Current step:** Fixing quote escaping in className attributes across affected files.
 
